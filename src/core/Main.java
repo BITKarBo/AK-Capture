@@ -7,9 +7,14 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+
+
 
 public class Main {
 	
@@ -21,20 +26,48 @@ public class Main {
 	static int x2=0;
 	static int y1=0;
 	static int y2=0;
-	
+	static int interval=1000;
+	static int kuvaindex=0;
 	//test
 
-	
-	public void capture() {
-		if(capturing=false) {
+	static Timer timer = new Timer();
+	public static void capture() {
+		 System.out.println("gg");
+		if(capturing==false) {
 			capturing=true;
 		
-			while (capturing) {
-				//lis‰t‰‰n kuvii kansioon
-			}
+		
+		timer.scheduleAtFixedRate(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                    	kuvaindex++;
+        				try {
+        		            Robot robot = new Robot();
+        		 
+        		            Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+        		           
+        		            BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+        		            File file = new File(kuvaindex+".png");
+        		            boolean status = ImageIO.write(bufferedImage, "png", file);
+        		            System.out.println("Screen Captured ? " + status + " File Path:- " + file.getAbsolutePath());
+        		 
+        		        } catch (AWTException | IOException ex) {
+        		            System.err.println(ex);
+        		        }
+                       
+            			
+                    }
+                },0,interval
+                
+                
+        );
+			
 		}
 	}
 	public void stopCapture() {
+		timer.cancel();
+		kuvaindex=0;
 		capturing=false;
 		//t‰h‰n sit vaikka se gif luonti tai uus metodi
 	}
@@ -42,7 +75,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 		//t‰nne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen keybindista ?
-		 
+		 /*
 		BufferedImage first = ImageIO.read(new File("/tmp/duke.jpg"));
         ImageOutputStream output = new FileImageOutputStream(new File("/tmp/example.gif"));
 
@@ -63,20 +96,8 @@ public class Main {
         writer.close();
         output.close();
 		
-		try {
-	            Robot robot = new Robot();
-	 
-	            Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-	           
-	            BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
-	            File file = new File("screen-capture.png");
-	            boolean status = ImageIO.write(bufferedImage, "png", file);
-	            System.out.println("Screen Captured ? " + status + " File Path:- " + file.getAbsolutePath());
-	 
-	        } catch (AWTException | IOException ex) {
-	            System.err.println(ex);
-	        }
-		 
+		*/
+		 capture();
 		 
 		 
 		 
