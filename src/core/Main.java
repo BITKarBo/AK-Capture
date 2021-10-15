@@ -1,9 +1,19 @@
 package core;
 
 import java.awt.AWTException;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.Robot;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -14,9 +24,12 @@ import java.util.TimerTask;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 public class Main{
 
+	
 	static ArrayList<File> kuvat = new ArrayList<File>();
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
@@ -24,29 +37,28 @@ public class Main{
 	static String finalformat = ".gif";
 	static String imageName = "image";
 	
+	static Rectangle mouseRect;
+	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	static boolean capturing = false; // kuvaus boolean
 	
-	
-	
-	static int x1 = 0; // valittu alue coordit?? placeholder voidaa miettii myöhemmi
-	static int x2 = 0;
-	static int y1 = 0;
-	static int y2 = 0;
-	static int interval = 50;
-	static int kuvamaara = 5;
+
+	static int interval = 10;
+	static int kuvamaara = 25;
 	static int kuvaindex = 0;
-	static int delay = 50;
+	static int delay = 10;
+	
+	static int mouseX, mouseY, mouseX2, mouseY2;
+	
 
 	static Timer timer = new Timer();
 
-	public static void capture() throws AWTException {
+	public static void capture(Rectangle rectangle) throws AWTException {
 
 		if (!capturing) {
 			
 			capturing = true;
 			
 			Robot robot = new Robot();
-			Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
@@ -128,6 +140,112 @@ public class Main{
 	public static void main(String[] args) throws AWTException {
 		alustus();
 		
+		JFrame frame = new JFrame("AK-Capture");
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout());
+		frame.setSize(dim.width, dim.height);
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		//frame.setUndecorated(true);
+		//frame.setLayout(null);
+		//frame.add(canvas, BorderLayout.CENTER);
+		frame.pack();
+		//frame.setLocationRelativeTo(null);
+		frame.setResizable(false);
+		frame.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyCode() == KeyEvent.VK_F9 && !capturing) {
+					try {
+						capture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(e.getKeyCode() == KeyEvent.VK_F8 && !capturing) {
+					try {
+						capture(mouseRect);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+				if(e.getKeyCode() == KeyEvent.VK_F10 && capturing) {
+					try {
+						stopCapture();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		frame.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				mouseX2 = e.getXOnScreen();
+				mouseY2 = e.getYOnScreen();
+				
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				mouseX = e.getXOnScreen();
+				mouseY = e.getYOnScreen();
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		frame.setVisible(true);
+		
+		mouseRect = new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+		
+		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("viina16.png"));
+        trayIcon.setToolTip("Running...");
+        trayIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                frame.setAlwaysOnTop(true);
+                frame.setVisible(true);
+                JOptionPane.showMessageDialog(null, "Clicked");
+            }
+        });
+
+        try {
+            SystemTray.getSystemTray().add(trayIcon);
+        }catch (Exception e){
+            System.out.println(e);
+        }
 		
 		// tänne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen
 		// keybindista ?
@@ -141,9 +259,9 @@ public class Main{
 //			e.printStackTrace();
 //		}
 		
-		capture();
+		
 
 	}
-
+	
 
 }
