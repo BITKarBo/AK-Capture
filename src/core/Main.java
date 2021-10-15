@@ -48,7 +48,7 @@ public class Main {
         		            Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         		           
         		            BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
-        		            File file = new File(kuvaindex+".png");
+        		            File file = new File("tmp/" + kuvaindex+".png");
         		            boolean status = ImageIO.write(bufferedImage, "png", file);
         		            System.out.println("Screen Captured ? " + status + " File Path:- " + file.getAbsolutePath());
         		 
