@@ -23,11 +23,11 @@ public class Main {
 	
 	public void capture() {
 		if(capturing=false) {
-		capturing=true;
+			capturing=true;
 		
-		while (capturing) {
-			//lis‰t‰‰n kuvii kansioon
-		}
+			while (capturing) {
+				//lis‰t‰‰n kuvii kansioon
+			}
 		}
 	}
 	public void stopCapture() {
