@@ -111,7 +111,7 @@ public class Main{
 				file.delete();
 			}
 		}
-		alustus();
+		kuvaindex = 0;
 		
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
