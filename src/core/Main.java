@@ -33,21 +33,21 @@ public class Main{
 
 	static Timer timer = new Timer();
 
-	public static void capture() {
+	public static void capture() throws AWTException {
 
 		if (capturing == false) {
 			capturing = true;
-			
+			Robot robot = new Robot();
+
+			Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+
+			BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
 					kuvaindex++;
 					try {
-						Robot robot = new Robot();
-
-						Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-
-						BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+					
 						File file = new File("tmp/" + kuvaindex + ".png");
 						kuvat.add(file);
 						boolean status = ImageIO.write(bufferedImage, "png", file);
@@ -60,7 +60,7 @@ public class Main{
 								e.printStackTrace();
 							}
 							
-					} catch (AWTException | IOException ex) {
+					} catch (IOException ex) {
 						System.err.println(ex);
 					}
 
@@ -95,7 +95,7 @@ public class Main{
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws AWTException {
 		// tänne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen
 		// keybindista ?
 //
