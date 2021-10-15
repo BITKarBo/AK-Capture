@@ -2,6 +2,7 @@ package core;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Rectangle;
@@ -31,6 +32,7 @@ public class Main{
 
 	
 	static ArrayList<File> kuvat = new ArrayList<File>();
+	static JFrame frame;
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
 	static String format = ".png";
@@ -59,7 +61,7 @@ public class Main{
 			capturing = true;
 			
 			Robot robot = new Robot();
-
+			timer = new Timer();
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
@@ -140,18 +142,21 @@ public class Main{
 	public static void main(String[] args) throws AWTException {
 		alustus();
 		
-		JFrame frame = new JFrame("AK-Capture");
+		frame = new JFrame("AK-Capture");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 		frame.setSize(dim.width, dim.height);
-		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		//frame.setUndecorated(true);
 		//frame.setLayout(null);
-		//frame.add(canvas, BorderLayout.CENTER);
+		Canvas canvas = new Canvas();
+		canvas.setPreferredSize(dim);
+		
+		frame.add(canvas, BorderLayout.CENTER);
 		frame.pack();
 		//frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
-		frame.addKeyListener(new KeyListener() {
+		canvas.addKeyListener(new KeyListener() {
 			
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -174,13 +179,13 @@ public class Main{
 						e1.printStackTrace();
 					}
 				}
-				if(e.getKeyCode() == KeyEvent.VK_F8 && !capturing) {
-					try {
-						capture(mouseRect);
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
-				}
+//				if(e.getKeyCode() == KeyEvent.VK_F8 && !capturing) {
+//					try {
+//						capture(mouseRect);
+//					} catch (Exception e1) {
+//						e1.printStackTrace();
+//					}
+//				}
 				if(e.getKeyCode() == KeyEvent.VK_F10 && capturing) {
 					try {
 						stopCapture();
@@ -190,13 +195,24 @@ public class Main{
 				}
 			}
 		});
-		frame.addMouseListener(new MouseListener() {
+		canvas.addMouseListener(new MouseListener() {
 			
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				mouseX2 = e.getXOnScreen();
 				mouseY2 = e.getYOnScreen();
-				
+				try {
+					if(mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
+						capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY));
+					}
+					else {
+						capture(new Rectangle(mouseX2, mouseY2, mouseX, mouseY));
+					}
+					
+				} catch (AWTException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 			
 			@Override
@@ -227,7 +243,7 @@ public class Main{
 		
 		frame.setVisible(true);
 		
-		mouseRect = new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+		
 		
 		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("viina16.png"));
         trayIcon.setToolTip("Running...");
