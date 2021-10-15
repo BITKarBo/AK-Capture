@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class main {
+public class Main {
 	static boolean capturing=false; //kuvaus boolean
 	
 	static int x1=0; // valittu alue coordit?? placeholder voidaa miettii myöhemmi
@@ -34,6 +34,7 @@ public class main {
 		capturing=false;
 		//tähän sit vaikka se gif luonti tai uus metodi
 	}
+		
 
 	public static void main(String[] args) {
 		//tänne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen keybindista ?
