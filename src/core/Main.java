@@ -18,42 +18,48 @@ import javax.imageio.stream.ImageOutputStream;
 public class Main{
 
 	static ArrayList<File> kuvat = new ArrayList<File>();
+	static File tmp = new File("tmp/");
+	static File output = new File("output/");
+	static String format = ".png";
+	static String finalformat = ".gif";
+	static String imageName = "image";
 	
 	static boolean capturing = false; // kuvaus boolean
-
+	
+	
 	
 	static int x1 = 0; // valittu alue coordit?? placeholder voidaa miettii myöhemmi
 	static int x2 = 0;
 	static int y1 = 0;
 	static int y2 = 0;
 	static int interval = 50;
+	static int kuvamaara = 5;
 	static int kuvaindex = 0;
 	static int delay = 50;
-	// test
 
 	static Timer timer = new Timer();
 
 	public static void capture() throws AWTException {
 
-		if (capturing == false) {
+		if (!capturing) {
+			
 			capturing = true;
+			
 			Robot robot = new Robot();
-
 			Rectangle rectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
 
-			BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
 					kuvaindex++;
 					try {
-					
-						File file = new File("tmp/" + kuvaindex + ".png");
+						BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+						File file = new File(tmp, + kuvaindex + format);
 						kuvat.add(file);
 						boolean status = ImageIO.write(bufferedImage, "png", file);
-						System.out.println("Screen Captured ? " + status + " File Path:- " + file.getAbsolutePath());
+						System.out.println("Screen Captured: " + status + " File Path:- " + file.getAbsolutePath());
 
-						if(kuvaindex >= 25)
+						if(kuvaindex >= kuvamaara)
 							try {
 								stopCapture();
 							} catch (Exception e) {
@@ -65,20 +71,23 @@ public class Main{
 					}
 
 				}
-			}, 0, interval
-
-			);
-
+			}, 0, interval);
 		}
+		
 	}
 
 	public static void stopCapture() throws Exception {
 		timer.cancel();
-		kuvaindex = 0;
+		alustus();
 		capturing = false;
+		
 
-		BufferedImage first = ImageIO.read(new File("tmp/1.png"));
-		ImageOutputStream gif = new FileImageOutputStream(new File("tmp/gifisi.gif"));
+		BufferedImage first = ImageIO.read(new File(tmp,("1"+format).toString()));
+		while(new File(output, imageName + kuvaindex + finalformat).exists()) {
+			
+			kuvaindex++;
+		}
+		ImageOutputStream gif = new FileImageOutputStream(new File(output,(imageName + kuvaindex + finalformat).toString()));
 
 		GifWriter writer = new GifWriter(gif, first.getType(), delay, true);
 		writer.writeToSequence(first);
@@ -92,10 +101,34 @@ public class Main{
 		writer.close();
 		gif.close();
 		
+		//
+		//	Kertoo gifin luonnin onnistumisen ja polun sekä tyhjentää tmp
+		//
+		
+		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
+		if(!kuvat.isEmpty()) {
+			for (File file : kuvat) {
+				file.delete();
+			}
+		}
+		alustus();
+		
 		// tähän sit vaikka se gif luonti tai uus metodi
+	}
+	
+	public static void alustus() {
+		//Alustaa kansion jos ei löydy
+		kuvaindex = 0;
+		if(!tmp.exists())
+			tmp.mkdir();
+		if(!output.exists())
+			output.mkdir();
 	}
 
 	public static void main(String[] args) throws AWTException {
+		alustus();
+		
+		
 		// tänne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen
 		// keybindista ?
 //
