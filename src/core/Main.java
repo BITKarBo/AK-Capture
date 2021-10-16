@@ -51,10 +51,10 @@ public class Main{
 	static boolean capturing = false; // kuvaus boolean
 	
 
-	static int interval = 100;
-	static int kuvamaara = 100;
+	static int interval = 10;
+	static int kuvamaara = 4;
 	static int kuvaindex = 0;
-	static int delay = 100;
+	static int delay = 10;
 	
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	
@@ -192,14 +192,18 @@ public class Main{
 		frame = new JFrame("AK-Capture");
 		
 		frame.setLayout(new BorderLayout());
+<<<<<<< Upstream, based on origin/main
 		frame.setSize(dim.width, dim.height);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+=======
+		frame.setSize(500, 500);
+>>>>>>> a7d11a6 Mouse selection for every direction
 		
 		//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		//frame.setUndecorated(true);
 		//frame.setLayout(null);
 		Canvas canvas = new Canvas();
-		canvas.setPreferredSize(dim);
+		canvas.setPreferredSize(new Dimension(500,500));
 		
 		frame.add(canvas, BorderLayout.CENTER);
 		frame.pack();
@@ -252,12 +256,14 @@ public class Main{
 				mouseX2 = e.getXOnScreen();
 				mouseY2 = e.getYOnScreen();
 				try {
-					if(mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
-						capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY));
-					}
-					else {
-						capture(new Rectangle(mouseX2, mouseY2, mouseX, mouseY));
-					}
+					if(mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) 				
+						capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY)); 	// 0,0 -> 1,1
+					else if(mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)			
+						capture(new Rectangle(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2));	// 0,1 -> 1,0
+					else if(mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)			
+						capture(new Rectangle(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY));	// 1,0 -> 0,1
+					else
+						capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2));	// 1,1 -> 0,0
 					
 				} catch (AWTException e1) {
 					// TODO Auto-generated catch block
