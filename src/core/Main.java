@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -52,10 +53,10 @@ public class Main{
 	static Rectangle mouseRect;
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	static boolean capturing = false; // kuvaus boolean
-	
-
+	static boolean loop = true; // kuvaus boolean
+	static MenuItem loopp;
 	static int interval = 100;
-	static int kuvamaara = 30;
+	//static int kuvamaara = 30;
 	static int kuvaindex = 0;
 	static int delay = 100;
 	
@@ -75,6 +76,14 @@ public class Main{
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
+					if(kuvaindex>=100000) {
+						try {
+							stopCapture();
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					System.out.println("Capturing");
 					kuvaindex++;
 					kuvat.add(robot.createScreenCapture(rectangle));
@@ -83,12 +92,7 @@ public class Main{
 					//boolean status = ImageIO.write(bufferedImage, "png", file);
 					//System.out.println("Screen Captured: " + status + " File Path:- " + file.getAbsolutePath());
 
-					if(kuvaindex >= kuvamaara)
-						try {
-							stopCapture();
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+				
 
 				}
 			}, 0, interval);
@@ -110,7 +114,7 @@ public class Main{
 		File giff =new File(output,(imageName + kuvaindex + finalformat).toString());
 		ImageOutputStream gif = new FileImageOutputStream(giff);
 
-		GifWriter writer = new GifWriter(gif, first.getType(), delay, true);
+		GifWriter writer = new GifWriter(gif, first.getType(), delay, loop);
 		writer.writeToSequence(first);
 
 		
@@ -164,7 +168,12 @@ public class Main{
         MenuItem item3 = new MenuItem("Low");
         item3.addActionListener(listen);
         popup.add(item3);
-        
+        popup.addSeparator();
+        loopp = new MenuItem("Loop: ON");
+     
+        loopp.addActionListener(listen);
+        popup.add(loopp);
+        popup.addSeparator();
         MenuItem close = new MenuItem("Close");
         close.addActionListener(listen);
         popup.add(close);
@@ -232,16 +241,16 @@ public class Main{
 						e1.printStackTrace();
 					}
 				}
-			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
+				else if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
 				valintamode=true;
 				valintamode();
 				
 				}
-			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
+				else if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
 				frame.setVisible(false);
 				valintamode=false;
 				}
-				if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F10 && capturing) {
+				else if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing) {
 					try {
 						stopCapture();
 					} catch (Exception e1) {
@@ -259,6 +268,7 @@ public class Main{
 				mouseX2 = e.getXOnScreen();
 				mouseY2 = e.getYOnScreen();
 				try {
+					if(mouseX!=mouseX2||mouseY!=mouseY2) {
 					if(mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) 				
 						capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY)); 	// 0,0 -> 1,1
 					else if(mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)			
@@ -267,6 +277,7 @@ public class Main{
 						capture(new Rectangle(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY));	// 1,0 -> 0,1
 					else
 						capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2));	// 1,1 -> 0,0
+					}
 					
 				} catch (AWTException e1) {
 					// TODO Auto-generated catch block

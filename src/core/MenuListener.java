@@ -21,6 +21,16 @@ class PopupActionListener extends Main implements ActionListener {
 			System.exit(1);
 
 		}
+		if (actionEvent.getActionCommand().equals("Loop: ON")) {
+			loop=false;
+			loopp.setActionCommand("Loop: OFF");
+			loopp.setLabel("Loop: OFF");
+		}
+		if (actionEvent.getActionCommand().equals("Loop: OFF")) {
+			loop=true;
+			loopp.setActionCommand("Loop: ON");
+			loopp.setLabel("Loop: ON");
+		}
 		System.out.println("Selected: " + actionEvent.getActionCommand());
 	}
 }
