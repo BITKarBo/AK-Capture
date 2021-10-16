@@ -50,7 +50,7 @@ public class Main {
 	static String finalformat = ".gif";
 	static String imageName = "image";
 	static File giff = null;
-	
+
 	static Rectangle mouseRect;
 
 	static MenuItem loopp;
@@ -59,69 +59,74 @@ public class Main {
 	static boolean capturing = false; // kuvaus
 	static boolean loop = true; // kuvaus
 	static boolean valintamode = false; // valinta
-
+	static boolean valmis = true;
+	
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
 	static int delay = 100;
-	
+
 	public static void capture(Rectangle rectangle) throws Exception {
+		valmis = false;
+		capturing = true;
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
+		frame.setVisible(false);
+		
 		
 		Thread ThreadKuva = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				if (!capturing) {
-					trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
-					frame.setVisible(false);
-					capturing = true;
-					double firstTime = 0;
-					double lastTime = System.nanoTime()/1000000000.0;
-					double passedTime = 0;
-					double unprocessedTime = 0;
-					double frameTime = 0;
-					boolean fpslimitter = true;
-					
-					while (capturing) {
-						
-						firstTime = System.nanoTime()/1000000000.0;
-						passedTime = firstTime - lastTime;
-						lastTime = firstTime;
 
-						unprocessedTime += passedTime;
-						frameTime += passedTime;
-						
+				double firstTime = 0;
+				double lastTime = System.nanoTime() / 1000000000.0;
+				double passedTime = 0;
+				double unprocessedTime = 0;
+				double frameTime = 0;
+				boolean fpslimitter = true;
 
-						while (unprocessedTime >= UPDATE_CAP) {
-							unprocessedTime -= UPDATE_CAP;
-							
-							
-							if (frameTime >= INTERVAL) {
-								fpslimitter = true;
-								frameTime = 0;
-							}
+				while (capturing) {
+
+					firstTime = System.nanoTime() / 1000000000.0;
+					passedTime = firstTime - lastTime;
+					lastTime = firstTime;
+
+					unprocessedTime += passedTime;
+					frameTime += passedTime;
+
+					while (unprocessedTime >= UPDATE_CAP) {
+						unprocessedTime -= UPDATE_CAP;
+
+						if (frameTime >= INTERVAL) {
+							fpslimitter = true;
+							frameTime = 0;
 						}
-						if (capturing && fpslimitter) {
-							fpslimitter = false;
-							System.out.println("Capturing: " + kuvaindex);
-							kuvaindex++;
-							kuvatque.add(robot.createScreenCapture(rectangle));
-						}
-
-						
 					}
+					if (capturing && fpslimitter) {
+						fpslimitter = false;
+						System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
+						
+						kuvaindex++;
+						kuvatque.add(robot.createScreenCapture(rectangle));
+					}
+
 				}
-				
+				capturing = false;
 			}
-			
+
 		});
 		Thread ThreadBuffer = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				
 				GifWriter writer = null;
-				while(capturing || kuvatque.peek() != null) {
-					if(kuvatque.peek() != null) {
+				boolean eka = true;
+				while (capturing || kuvatque.peek() != null) {
+					
+					if (kuvatque.peek() != null) {
+						System.out.println("BUFFER QUESIZE: " + kuvatque.size());
 						BufferedImage kuva = kuvatque.poll();
-						if(kuvaindex == 1) {
+						if (eka) {
+							eka = false;
 							int nameindex = 0;
 							while (new File(output, imageName + nameindex + finalformat).exists()) {
 
@@ -134,13 +139,13 @@ public class Main {
 								e.printStackTrace();
 							}
 						}
-						
+
 						try {
 							writer.writeToSequence(kuva);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					} 
+					}
 				}
 				try {
 					writer.close();
@@ -153,17 +158,15 @@ public class Main {
 		
 		ThreadKuva.start();
 		ThreadBuffer.start();
-		
+
 	}
 
 	public static void stopCapture() throws Exception {
-		
-		
-		
+		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
-		//writer.close();
-		
+		// writer.close();
+
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
@@ -260,15 +263,15 @@ public class Main {
 
 			@Override
 			public void keyPressed(GlobalKeyEvent e) {
-				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && !capturing) {
+				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && !capturing && valmis) {
 					try {
 						capture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
-				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
+				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode && valmis) {
 					valintamode = true;
-					
+
 					valintamode();
 
 				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
@@ -277,8 +280,8 @@ public class Main {
 				} else if ((e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing)
 						|| (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && capturing)) {
 
-						capturing = false;
-					
+					capturing = false;
+
 				}
 			}
 		});
