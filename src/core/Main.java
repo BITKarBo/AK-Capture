@@ -17,16 +17,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import java.util.ArrayDeque;
 
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
@@ -34,7 +34,10 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
 public class Main {
 
+	static private final double UPDATE_CAP = 1.0 / 144.0;
+
 	static ArrayList<BufferedImage> kuvat = new ArrayList<BufferedImage>();
+	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -48,79 +51,113 @@ public class Main {
 	static String format = ".png";
 	static String finalformat = ".gif";
 	static String imageName = "image";
-
-	static Timer timer = new Timer();
+	static File giff = null;
+	static GifWriter writer = null;
 	static Rectangle mouseRect;
 
 	static MenuItem loopp;
 	static TrayIcon trayIcon;
 
-	static boolean capturing = false; 	// kuvaus 
-	static boolean loop = true; 		// kuvaus 
-	static boolean valintamode = false;	// valinta
+	static boolean capturing = false; // kuvaus
+	static boolean loop = true; // kuvaus
+	static boolean valintamode = false; // valinta
 
-	static int interval = 100;
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
 	static int delay = 100;
 	// static int kuvamaara = 30;
 
-	public static void capture(Rectangle rectangle) throws AWTException {
+	public static void capture(Rectangle rectangle) throws Exception {
+		
+		Thread t = new Thread(new Runnable() {
 
-		if (!capturing) {
-			trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
-			frame.setVisible(false);
+			@Override
+			public void run() {
+				if (!capturing) {
+					trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
+					frame.setVisible(false);
+					capturing = true;
+					double firstTime = 0;
+					double lastTime = System.nanoTime()/1000000000.0;
+					double passedTime = 0;
+					double unprocessedTime = 0;
+					double frameTime = 0;
+					
+					while (capturing /*|| kuvatque.size() > 0*/) {
 
-			capturing = true;
+						firstTime = System.nanoTime()/1000000000.0;
+						passedTime = firstTime - lastTime;
+						lastTime = firstTime;
 
-			timer = new Timer();
-			timer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					if (kuvaindex >= 100000) {
-						try {
-							stopCapture();
-						} catch (Exception e) {
-							e.printStackTrace();
+						unprocessedTime += passedTime;
+						frameTime += passedTime;
+						
+
+						while (unprocessedTime >= UPDATE_CAP) {
+							unprocessedTime -= UPDATE_CAP;
+
+							if (frameTime >= 1.0) {
+
+								frameTime = 0;
+
+							}
 						}
-					}
-					System.out.println("Capturing");
-					kuvaindex++;
-					kuvat.add(robot.createScreenCapture(rectangle));
-				}
-			}, 0, interval);
-		}
+						if (capturing) {
+							System.out.println("Capturing: " + kuvaindex);
+							kuvaindex++;
+							kuvatque.add(robot.createScreenCapture(rectangle));
+							
+						}
+						else {
+							System.out.println("Stopped");
+						}
+						while(kuvatque.peek() != null) {
+							BufferedImage kuva = kuvatque.poll();
+							if(kuvaindex == 1) {
+								int nameindex = 0;
+								while (new File(output, imageName + nameindex + finalformat).exists()) {
 
+									nameindex++;
+								}
+								giff = new File(output, (imageName + nameindex + finalformat).toString());
+								try {
+									writer = new GifWriter(new FileImageOutputStream(giff), kuva.getType(), delay, loop);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+							
+							try {
+								writer.writeToSequence(kuva);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						} 
+					}
+					
+					try {
+						stopCapture();
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			}
+			
+		});
+		
+		t.start();
 	}
 
 	public static void stopCapture() throws Exception {
-		timer.cancel();
-		alustus();
+		kuvaindex = 0;
 		capturing = false;
+		//writer.close();
+		
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
-
-		BufferedImage first = kuvat.get(0);
-		while (new File(output, imageName + kuvaindex + finalformat).exists()) {
-
-			kuvaindex++;
-		}
-		File giff = new File(output, (imageName + kuvaindex + finalformat).toString());
-		ImageOutputStream gif = new FileImageOutputStream(giff);
-
-		GifWriter writer = new GifWriter(gif, first.getType(), delay, loop);
-		writer.writeToSequence(first);
-
-		for (BufferedImage i : kuvat) {
-
-			writer.writeToSequence(i);
-		}
-
-		writer.close();
-		gif.close();
-
-		//
-		// Kertoo gifin luonnin onnistumisen ja polun sekä tyhjentää tmp
-		//
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
 		alustus();
@@ -141,7 +178,6 @@ public class Main {
 	public static void alustus() {
 		// Alustaa kansion jos ei löydy
 		valintamode = false;
-		kuvat.clear();
 		kuvaindex = 0;
 		if (!output.exists())
 			output.mkdir();
@@ -207,13 +243,12 @@ public class Main {
 
 		frame.setResizable(false);
 		frame.setVisible(false);
-		
 
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
 
 			@Override
 			public void keyReleased(GlobalKeyEvent e) {
-				
+
 			}
 
 			@Override
@@ -226,17 +261,17 @@ public class Main {
 					}
 				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
 					valintamode = true;
+					
 					valintamode();
 
 				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
 					frame.setVisible(false);
 					valintamode = false;
-				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing) {
-					try {
-						stopCapture();
-					} catch (Exception e1) {
-						e1.printStackTrace();
-					}
+				} else if ((e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing)
+						|| (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && capturing)) {
+
+						capturing = false;
+					
 				}
 			}
 		});
@@ -264,7 +299,7 @@ public class Main {
 																												// 0,0
 						}
 
-					} catch (AWTException e1) {
+					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 				}
@@ -299,9 +334,9 @@ public class Main {
 		iconMenu(trayIcon);
 
 	}
-	
+
 	public static void main(String[] args) throws Exception {
-		
+
 		alustus();
 		Window();
 	}
