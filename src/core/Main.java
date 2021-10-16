@@ -4,8 +4,6 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
-import java.awt.GraphicsEnvironment;
-import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
@@ -13,9 +11,6 @@ import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -37,68 +32,65 @@ import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
-public class Main{
+public class Main {
+
+	static ArrayList<BufferedImage> kuvat = new ArrayList<BufferedImage>();
+	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
+	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
 	static Robot robot;
-	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
-	static ArrayList<BufferedImage> kuvat = new ArrayList<BufferedImage>();
-	static JFrame frame;
-	static JLabel label;
+
+	static JFrame frame = new JFrame("AK-Capture");;
+	static JLabel label = new JLabel();;
+	static JPanel pane = new JPanel();;
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
 	static String format = ".png";
 	static String finalformat = ".gif";
 	static String imageName = "image";
-	static boolean valintamode=false;
-	static Rectangle mouseRect;
-	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-	static boolean capturing = false; // kuvaus boolean
-	static boolean loop = true; // kuvaus boolean
-	static MenuItem loopp;
-	static int interval = 100;
-	//static int kuvamaara = 30;
-	static int kuvaindex = 0;
-	static int delay = 100;
-	static TrayIcon trayIcon;
-	static int mouseX, mouseY, mouseX2, mouseY2;
-	
 
 	static Timer timer = new Timer();
+	static Rectangle mouseRect;
+
+	static MenuItem loopp;
+	static TrayIcon trayIcon;
+
+	static boolean capturing = false; 	// kuvaus 
+	static boolean loop = true; 		// kuvaus 
+	static boolean valintamode = false;	// valinta
+
+	static int interval = 100;
+	static int mouseX, mouseY, mouseX2, mouseY2;
+	static int kuvaindex = 0;
+	static int delay = 100;
+	// static int kuvamaara = 30;
 
 	public static void capture(Rectangle rectangle) throws AWTException {
 
 		if (!capturing) {
 			trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
 			frame.setVisible(false);
-			
+
 			capturing = true;
-			
+
 			timer = new Timer();
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
-					if(kuvaindex>=100000) {
+					if (kuvaindex >= 100000) {
 						try {
 							stopCapture();
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
 					System.out.println("Capturing");
 					kuvaindex++;
 					kuvat.add(robot.createScreenCapture(rectangle));
-					//File file = new File(tmp, + kuvaindex + format);
-					
-					//boolean status = ImageIO.write(bufferedImage, "png", file);
-					//System.out.println("Screen Captured: " + status + " File Path:- " + file.getAbsolutePath());
-
-				
-
 				}
 			}, 0, interval);
 		}
-		
+
 	}
 
 	public static void stopCapture() throws Exception {
@@ -108,109 +100,102 @@ public class Main{
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
 
 		BufferedImage first = kuvat.get(0);
-		while(new File(output, imageName + kuvaindex + finalformat).exists()) {
-			
+		while (new File(output, imageName + kuvaindex + finalformat).exists()) {
+
 			kuvaindex++;
 		}
-		File giff =new File(output,(imageName + kuvaindex + finalformat).toString());
+		File giff = new File(output, (imageName + kuvaindex + finalformat).toString());
 		ImageOutputStream gif = new FileImageOutputStream(giff);
 
 		GifWriter writer = new GifWriter(gif, first.getType(), delay, loop);
 		writer.writeToSequence(first);
 
-		
 		for (BufferedImage i : kuvat) {
-		
+
 			writer.writeToSequence(i);
 		}
 
 		writer.close();
 		gif.close();
-		
+
 		//
-		//	Kertoo gifin luonnin onnistumisen ja polun sekä tyhjentää tmp
+		// Kertoo gifin luonnin onnistumisen ja polun sekä tyhjentää tmp
 		//
-	
-		 
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
-		valintamode=false;
-		kuvaindex = 0;
-		kuvat.clear();
+		alustus();
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
+
 	public static void valintamode() {
-		label.setIcon(new ImageIcon(robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()))));
-		
+		label.setIcon(
+				new ImageIcon(robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()))));
+
 		frame.setVisible(true);
 		frame.toFront();
 		frame.requestFocus();
-	//todo
-	//tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
+		// todo
+		// tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
 	}
+
 	public static void alustus() {
-		//Alustaa kansion jos ei löydy
+		// Alustaa kansion jos ei löydy
+		valintamode = false;
+		kuvat.clear();
 		kuvaindex = 0;
-		if(!tmp.exists())
-			tmp.mkdir();
-		if(!output.exists())
+		if (!output.exists())
 			output.mkdir();
 	}
-	public static void iconMenu(TrayIcon icon) {
-        PopupMenu popup = new PopupMenu();
-        MenuItem item = new MenuItem("High");
-        popup.add(item);
-        ActionListener listen = new PopupActionListener();
-        
-        item.addActionListener(listen);
-        MenuItem item2 = new MenuItem("Medium");
-        item2.addActionListener(listen);
-        popup.add(item2);
-        MenuItem item3 = new MenuItem("Low");
-        item3.addActionListener(listen);
-        popup.add(item3);
-        popup.addSeparator();
-        loopp = new MenuItem("Loop: ON");
-     
-        loopp.addActionListener(listen);
-        popup.add(loopp);
-        popup.addSeparator();
-        MenuItem close = new MenuItem("Close");
-        close.addActionListener(listen);
-        popup.add(close);
-		icon.setPopupMenu(popup);
-		
-	    icon.addMouseListener(new MouseAdapter() {
-	            @Override
-	            public void mouseClicked(MouseEvent e) {
-	                super.mouseClicked(e);
-	                /* gui tähän vaikka sit myöhemmin
-	                frame.setAlwaysOnTop(true);
-	                frame.setVisible(true);
-	                JOptionPane.showMessageDialog(null, "Clicked");
-	                */
-	            }
-	        });
 
-	        try {
-	            SystemTray.getSystemTray().add(icon);
-	        }catch (Exception e){
-	            System.out.println(e);
-	        }
+	public static void iconMenu(TrayIcon icon) {
+
+		PopupMenu popup = new PopupMenu();
+		MenuItem item = new MenuItem("High");
+		popup.add(item);
+		ActionListener listen = new PopupActionListener();
+
+		item.addActionListener(listen);
+		MenuItem item2 = new MenuItem("Medium");
+		item2.addActionListener(listen);
+		popup.add(item2);
+		MenuItem item3 = new MenuItem("Low");
+		item3.addActionListener(listen);
+		popup.add(item3);
+		popup.addSeparator();
+		loopp = new MenuItem("Loop: ON");
+
+		loopp.addActionListener(listen);
+		popup.add(loopp);
+		popup.addSeparator();
+		MenuItem close = new MenuItem("Close");
+		close.addActionListener(listen);
+		popup.add(close);
+		icon.setPopupMenu(popup);
+
+		icon.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				super.mouseClicked(e);
+				/*
+				 * gui tähän vaikka sit myöhemmin frame.setAlwaysOnTop(true);
+				 * frame.setVisible(true); JOptionPane.showMessageDialog(null, "Clicked");
+				 */
+			}
+		});
+
+		try {
+			SystemTray.getSystemTray().add(icon);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
-	public static void main(String[] args) throws Exception {
-		
-		
-		alustus();
-		
+
+	public static void Window() throws AWTException {
 		robot = new Robot();
-		frame = new JFrame("AK-Capture");
-		label = new JLabel();
-		
-		JPanel pane = new JPanel();
-		dim.setSize(dim.width, dim.height+5);
+
+		dim.setSize(dim.width, dim.height + 5);
 		pane.setSize(dim);
-		
+
 		pane.setLocation(0, -5);
 		pane.add(label);
 		frame.add(pane);
@@ -223,35 +208,30 @@ public class Main{
 		frame.setResizable(false);
 		frame.setVisible(false);
 		
+
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
-			
-		
-			
+
 			@Override
 			public void keyReleased(GlobalKeyEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
-			
+
 			@Override
 			public void keyPressed(GlobalKeyEvent e) {
-				if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && !capturing) {
+				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && !capturing) {
 					try {
 						capture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
-				}
-				else if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
-				valintamode=true;
-				valintamode();
-				
-				}
-				else if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
-				frame.setVisible(false);
-				valintamode=false;
-				}
-				else if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing) {
+				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
+					valintamode = true;
+					valintamode();
+
+				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
+					frame.setVisible(false);
+					valintamode = false;
+				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing) {
 					try {
 						stopCapture();
 					} catch (Exception e1) {
@@ -260,67 +240,69 @@ public class Main{
 				}
 			}
 		});
-	
+
 		frame.addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				if(valintamode==true) {
-				mouseX2 = e.getXOnScreen();
-				mouseY2 = e.getYOnScreen();
-				try {
-					if(mouseX!=mouseX2||mouseY!=mouseY2) {
-					if(mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) 				
-						capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY)); 	// 0,0 -> 1,1
-					else if(mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)			
-						capture(new Rectangle(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2));	// 0,1 -> 1,0
-					else if(mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)			
-						capture(new Rectangle(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY));	// 1,0 -> 0,1
-					else
-						capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2));	// 1,1 -> 0,0
+				if (valintamode == true) {
+					mouseX2 = e.getXOnScreen();
+					mouseY2 = e.getYOnScreen();
+					try {
+						if (mouseX != mouseX2 || mouseY != mouseY2) {
+							if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0)
+								capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY)); // 0,0 ->
+																											// 1,1
+							else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)
+								capture(new Rectangle(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2)); // 0,1 ->
+																												// 1,0
+							else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)
+								capture(new Rectangle(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY)); // 1,0 ->
+																												// 0,1
+							else
+								capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2)); // 1,1 ->
+																												// 0,0
+						}
+
+					} catch (AWTException e1) {
+						e1.printStackTrace();
 					}
-					
-				} catch (AWTException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 				}
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent e) {
-				if(valintamode==true) {
-				mouseX = e.getXOnScreen();
-				mouseY = e.getYOnScreen();
+				if (valintamode == true) {
+					mouseX = e.getXOnScreen();
+					mouseY = e.getYOnScreen();
 				}
-				
+
 			}
-			
+
 			@Override
 			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
-		//lol
-		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"),"running");
-		iconMenu(trayIcon);
 
+		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"), "running");
+		iconMenu(trayIcon);
 
 	}
 	
-
+	public static void main(String[] args) throws Exception {
+		
+		alustus();
+		Window();
+	}
 }
