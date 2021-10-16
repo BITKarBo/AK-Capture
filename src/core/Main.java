@@ -40,16 +40,16 @@ public class Main{
 	static String format = ".png";
 	static String finalformat = ".gif";
 	static String imageName = "image";
-	
+	static boolean valintamode=false;
 	static Rectangle mouseRect;
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	static boolean capturing = false; // kuvaus boolean
 	
 
-	static int interval = 10;
-	static int kuvamaara = 25;
+	static int interval = 100;
+	static int kuvamaara = 100;
 	static int kuvaindex = 0;
-	static int delay = 10;
+	static int delay = 100;
 	
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	
@@ -131,7 +131,10 @@ public class Main{
 		
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
-	
+	public static void valintamode() {
+	//todo
+	//tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
+	}
 	public static void alustus() {
 		//Alustaa kansion jos ei löydy
 		kuvaindex = 0;
@@ -140,7 +143,35 @@ public class Main{
 		if(!output.exists())
 			output.mkdir();
 	}
+	public static void iconMenu(TrayIcon icon) {
+        PopupMenu popup = new PopupMenu();
+        MenuItem item = new MenuItem("Preset: High");
+        popup.add(item);
+        MenuItem item2 = new MenuItem("Preset: Medium");
+    
+        popup.add(item2);
+        MenuItem item3 = new MenuItem("Preset: Low");
+        popup.add(item3);
+		icon.setPopupMenu(popup);
+		
+	    icon.addMouseListener(new MouseAdapter() {
+	            @Override
+	            public void mouseClicked(MouseEvent e) {
+	                super.mouseClicked(e);
+	                /* gui tähän vaikka sit myöhemmin
+	                frame.setAlwaysOnTop(true);
+	                frame.setVisible(true);
+	                JOptionPane.showMessageDialog(null, "Clicked");
+	                */
+	            }
+	        });
 
+	        try {
+	            SystemTray.getSystemTray().add(icon);
+	        }catch (Exception e){
+	            System.out.println(e);
+	        }
+	}
 	public static void main(String[] args) throws AWTException {
 		alustus();
 		
@@ -181,13 +212,11 @@ public class Main{
 						e1.printStackTrace();
 					}
 				}
-//				if(e.getKeyCode() == KeyEvent.VK_F8 && !capturing) {
-//					try {
-//						capture(mouseRect);
-//					} catch (Exception e1) {
-//						e1.printStackTrace();
-//					}
-//				}
+			if(e.getKeyCode() == KeyEvent.VK_F8 && !capturing) {
+				valintamode=true;
+				valintamode();
+				
+				}
 				if(e.getKeyCode() == KeyEvent.VK_F10 && capturing) {
 					try {
 						stopCapture();
@@ -201,6 +230,7 @@ public class Main{
 			
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				if(valintamode==true) {
 				mouseX2 = e.getXOnScreen();
 				mouseY2 = e.getYOnScreen();
 				try {
@@ -215,12 +245,15 @@ public class Main{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
+				}
 			}
 			
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if(valintamode==true) {
 				mouseX = e.getXOnScreen();
 				mouseY = e.getYOnScreen();
+				}
 				
 			}
 			
@@ -269,30 +302,5 @@ public class Main{
 
 	}
 	
-	public static void iconMenu(TrayIcon icon) {
-        PopupMenu popup = new PopupMenu();
-        MenuItem item = new MenuItem("Preset: High");
-        popup.add(item);
-        MenuItem item2 = new MenuItem("Preset: Medium");
-        popup.add(item2);
-        MenuItem item3 = new MenuItem("Preset: Low");
-        popup.add(item3);
-		icon.setPopupMenu(popup);
-		
-	    icon.addMouseListener(new MouseAdapter() {
-	            @Override
-	            public void mouseClicked(MouseEvent e) {
-	                super.mouseClicked(e);
-	                frame.setAlwaysOnTop(true);
-	                frame.setVisible(true);
-	                JOptionPane.showMessageDialog(null, "Clicked");
-	            }
-	        });
 
-	        try {
-	            SystemTray.getSystemTray().add(icon);
-	        }catch (Exception e){
-	            System.out.println(e);
-	        }
-	}
 }
