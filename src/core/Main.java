@@ -17,9 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.ImageIcon;
@@ -36,7 +34,6 @@ public class Main {
 
 	static private final double UPDATE_CAP = 1.0 / 144.0;
 
-	static ArrayList<BufferedImage> kuvat = new ArrayList<BufferedImage>();
 	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
