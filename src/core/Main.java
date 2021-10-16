@@ -5,6 +5,8 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.SystemTray;
@@ -242,26 +244,14 @@ public class Main{
 		});
 		
 		frame.setVisible(true);
-		
-		
-		
-		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("viina16.png"));
-        trayIcon.setToolTip("Running...");
-        trayIcon.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                frame.setAlwaysOnTop(true);
-                frame.setVisible(true);
-                JOptionPane.showMessageDialog(null, "Clicked");
-            }
-        });
+		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("viina16.png"),"running");
+		iconMenu(trayIcon);
 
-        try {
-            SystemTray.getSystemTray().add(trayIcon);
-        }catch (Exception e){
-            System.out.println(e);
-        }
+		
+		
+     
+
+   
 		
 		// tänne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen
 		// keybindista ?
@@ -279,5 +269,30 @@ public class Main{
 
 	}
 	
+	public static void iconMenu(TrayIcon icon) {
+        PopupMenu popup = new PopupMenu();
+        MenuItem item = new MenuItem("Preset: High");
+        popup.add(item);
+        MenuItem item2 = new MenuItem("Preset: Medium");
+        popup.add(item2);
+        MenuItem item3 = new MenuItem("Preset: Low");
+        popup.add(item3);
+		icon.setPopupMenu(popup);
+		
+	    icon.addMouseListener(new MouseAdapter() {
+	            @Override
+	            public void mouseClicked(MouseEvent e) {
+	                super.mouseClicked(e);
+	                frame.setAlwaysOnTop(true);
+	                frame.setVisible(true);
+	                JOptionPane.showMessageDialog(null, "Clicked");
+	            }
+	        });
 
+	        try {
+	            SystemTray.getSystemTray().add(icon);
+	        }catch (Exception e){
+	            System.out.println(e);
+	        }
+	}
 }
