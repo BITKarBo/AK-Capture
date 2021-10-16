@@ -38,7 +38,7 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 public class Main{
 
 	
-	static ArrayList<File> kuvat = new ArrayList<File>();
+	static ArrayList<BufferedImage> kuvat = new ArrayList<BufferedImage>();
 	static JFrame frame;
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
@@ -51,10 +51,10 @@ public class Main{
 	static boolean capturing = false; // kuvaus boolean
 	
 
-	static int interval = 10;
-	static int kuvamaara = 4;
+	static int interval = 100;
+	static int kuvamaara = 30;
 	static int kuvaindex = 0;
-	static int delay = 10;
+	static int delay = 100;
 	
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	
@@ -65,6 +65,7 @@ public class Main{
 
 		if (!capturing) {
 			
+			
 			capturing = true;
 			
 			Robot robot = new Robot();
@@ -72,24 +73,21 @@ public class Main{
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
+					System.out.println("Capturing");
 					kuvaindex++;
-					try {
-						BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
-						File file = new File(tmp, + kuvaindex + format);
-						kuvat.add(file);
-						boolean status = ImageIO.write(bufferedImage, "png", file);
-						System.out.println("Screen Captured: " + status + " File Path:- " + file.getAbsolutePath());
+					BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+					//File file = new File(tmp, + kuvaindex + format);
+					kuvat.add(bufferedImage);
+					
+					//boolean status = ImageIO.write(bufferedImage, "png", file);
+					//System.out.println("Screen Captured: " + status + " File Path:- " + file.getAbsolutePath());
 
-						if(kuvaindex >= kuvamaara)
-							try {
-								stopCapture();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-							
-					} catch (IOException ex) {
-						System.err.println(ex);
-					}
+					if(kuvaindex >= kuvamaara)
+						try {
+							stopCapture();
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 
 				}
 			}, 0, interval);
@@ -103,7 +101,7 @@ public class Main{
 		capturing = false;
 		
 
-		BufferedImage first = ImageIO.read(new File(tmp,("1"+format).toString()));
+		BufferedImage first = kuvat.get(0);
 		while(new File(output, imageName + kuvaindex + finalformat).exists()) {
 			
 			kuvaindex++;
@@ -114,9 +112,9 @@ public class Main{
 		writer.writeToSequence(first);
 
 		
-		for (File i : kuvat) {
-			BufferedImage next = ImageIO.read(i);
-			writer.writeToSequence(next);
+		for (BufferedImage i : kuvat) {
+		
+			writer.writeToSequence(i);
 		}
 
 		writer.close();
@@ -127,13 +125,9 @@ public class Main{
 		//
 		
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
-		if(!kuvat.isEmpty()) {
-			for (File file : kuvat) {
-				file.delete();
-			}
-		}
-		kuvaindex = 0;
 		
+		kuvaindex = 0;
+		kuvat.clear();
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
 	public static void valintamode() {
