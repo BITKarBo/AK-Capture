@@ -33,7 +33,7 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 public class Main {
 
 	static private final double UPDATE_CAP = 1.0 / 60.0;
-	static private final double INTERVAL = 1.25; // time between screenshots
+	static private final double INTERVAL = .025; // time between screenshots
 
 	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
@@ -149,6 +149,8 @@ public class Main {
 	}
 
 	public static void stopCapture() throws Exception {
+		writer.close();
+		
 		kuvaindex = 0;
 		capturing = false;
 		//writer.close();
