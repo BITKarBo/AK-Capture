@@ -16,6 +16,11 @@ class PopupActionListener extends Main implements ActionListener {
 			delay = 200;
 
 		}
+		if (actionEvent.getActionCommand().equals("Close")) {
+			System.out.println("Closed");
+			System.exit(1);
+
+		}
 		System.out.println("Selected: " + actionEvent.getActionCommand());
 	}
 }

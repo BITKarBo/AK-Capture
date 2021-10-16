@@ -137,6 +137,7 @@ public class Main{
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
 	public static void valintamode() {
+		frame.setVisible(true);
 	//todo
 	//tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
 	}
@@ -161,6 +162,10 @@ public class Main{
         MenuItem item3 = new MenuItem("Low");
         item3.addActionListener(listen);
         popup.add(item3);
+        
+        MenuItem close = new MenuItem("Close");
+        close.addActionListener(listen);
+        popup.add(close);
 		icon.setPopupMenu(popup);
 		
 	    icon.addMouseListener(new MouseAdapter() {
@@ -185,9 +190,11 @@ public class Main{
 		alustus();
 		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 		frame = new JFrame("AK-Capture");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		frame.setLayout(new BorderLayout());
 		frame.setSize(dim.width, dim.height);
+		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		
 		//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		//frame.setUndecorated(true);
 		//frame.setLayout(null);
@@ -198,7 +205,7 @@ public class Main{
 		frame.pack();
 		//frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
-		
+		frame.setVisible(false);
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
 			
 		
@@ -223,6 +230,10 @@ public class Main{
 				valintamode();
 				
 				}
+			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
+				frame.setVisible(false);
+				
+				}
 				if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F10 && capturing) {
 					try {
 						stopCapture();
@@ -232,6 +243,7 @@ public class Main{
 				}
 			}
 		});
+	
 		canvas.addMouseListener(new MouseListener() {
 			
 			@Override
@@ -282,7 +294,7 @@ public class Main{
 			}
 		});
 		
-		frame.setVisible(true);
+		
 		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("viina16.png"),"running");
 		iconMenu(trayIcon);
 
