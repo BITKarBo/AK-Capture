@@ -122,7 +122,7 @@ public class Main{
 		//
 		
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
-		
+		valintamode=false;
 		kuvaindex = 0;
 		kuvat.clear();
 		// tähän sit vaikka se gif luonti tai uus metodi
