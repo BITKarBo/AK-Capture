@@ -69,6 +69,7 @@ public class Main {
 		valmis = false;
 		capturing = true;
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
+		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
 		
 		
@@ -174,6 +175,7 @@ public class Main {
 	}
 
 	public static void stopCapture() throws Exception {
+		trayIcon.setToolTip("Ready");
 		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
@@ -291,7 +293,7 @@ public class Main {
 					valintamode = false;
 				} else if ((e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing)
 						|| (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && capturing)) {
-
+					trayIcon.setToolTip("Buffering...");
 					capturing = false;
 
 				}
