@@ -32,7 +32,8 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
 public class Main {
 
-	static private final double UPDATE_CAP = 1.0 / 144.0;
+	static private final double UPDATE_CAP = 1.0 / 60.0;
+	static private final double INTERVAL = 1.25; // time between screenshots
 
 	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
@@ -62,8 +63,7 @@ public class Main {
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
 	static int delay = 100;
-	// static int kuvamaara = 30;
-
+	
 	public static void capture(Rectangle rectangle) throws Exception {
 		
 		Thread t = new Thread(new Runnable() {
@@ -79,9 +79,10 @@ public class Main {
 					double passedTime = 0;
 					double unprocessedTime = 0;
 					double frameTime = 0;
+					boolean fpslimitter = true;
 					
-					while (capturing /*|| kuvatque.size() > 0*/) {
-
+					while (capturing || kuvatque.size() > 0) {
+						
 						firstTime = System.nanoTime()/1000000000.0;
 						passedTime = firstTime - lastTime;
 						lastTime = firstTime;
@@ -92,23 +93,21 @@ public class Main {
 
 						while (unprocessedTime >= UPDATE_CAP) {
 							unprocessedTime -= UPDATE_CAP;
-
-							if (frameTime >= 1.0) {
-
+							
+							
+							if (frameTime >= INTERVAL) {
+								fpslimitter = true;
 								frameTime = 0;
-
 							}
 						}
-						if (capturing) {
+						if (capturing && fpslimitter) {
+							fpslimitter = false;
 							System.out.println("Capturing: " + kuvaindex);
 							kuvaindex++;
 							kuvatque.add(robot.createScreenCapture(rectangle));
-							
 						}
-						else {
-							System.out.println("Stopped");
-						}
-						while(kuvatque.peek() != null) {
+
+						if(kuvatque.peek() != null) {
 							BufferedImage kuva = kuvatque.poll();
 							if(kuvaindex == 1) {
 								int nameindex = 0;
