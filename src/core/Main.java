@@ -2,7 +2,6 @@ package core;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.MenuItem;
@@ -13,23 +12,21 @@ import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
@@ -37,9 +34,11 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
 public class Main{
 
-	
+	static Robot robot;
+	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static ArrayList<BufferedImage> kuvat = new ArrayList<BufferedImage>();
 	static JFrame frame;
+	static JLabel label;
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
 	static String format = ".png";
@@ -64,20 +63,18 @@ public class Main{
 	public static void capture(Rectangle rectangle) throws AWTException {
 
 		if (!capturing) {
-			
+			frame.setVisible(false);
 			
 			capturing = true;
 			
-			Robot robot = new Robot();
 			timer = new Timer();
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
 					System.out.println("Capturing");
 					kuvaindex++;
-					BufferedImage bufferedImage = robot.createScreenCapture(rectangle);
+					kuvat.add(robot.createScreenCapture(rectangle));
 					//File file = new File(tmp, + kuvaindex + format);
-					kuvat.add(bufferedImage);
 					
 					//boolean status = ImageIO.write(bufferedImage, "png", file);
 					//System.out.println("Screen Captured: " + status + " File Path:- " + file.getAbsolutePath());
@@ -131,7 +128,11 @@ public class Main{
 		// tähän sit vaikka se gif luonti tai uus metodi
 	}
 	public static void valintamode() {
+		label.setIcon(new ImageIcon(robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()))));
+		
 		frame.setVisible(true);
+		frame.toFront();
+		frame.requestFocus();
 	//todo
 	//tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
 	}
@@ -181,25 +182,28 @@ public class Main{
 	        }
 	}
 	public static void main(String[] args) throws AWTException {
-		alustus();
-		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
-		frame = new JFrame("AK-Capture");
 		
+		
+		alustus();
+		
+		robot = new Robot();
+		frame = new JFrame("AK-Capture");
+		label = new JLabel();
+		
+		JPanel pane = new JPanel();
+		
+		pane.setSize(dim);
+		pane.add(label);
+		frame.add(pane);
 		frame.setLayout(new BorderLayout());
 		frame.setSize(dim.width, dim.height);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		frame.setSize(500, 500);
-		//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		//frame.setUndecorated(true);
-		//frame.setLayout(null);
-		Canvas canvas = new Canvas();
-		canvas.setPreferredSize(new Dimension(500,500));
-		
-		frame.add(canvas, BorderLayout.CENTER);
-		frame.pack();
-		//frame.setLocationRelativeTo(null);
+		frame.setUndecorated(true);
+		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+
 		frame.setResizable(false);
 		frame.setVisible(false);
+		
 		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
 			
 		
@@ -219,14 +223,14 @@ public class Main{
 						e1.printStackTrace();
 					}
 				}
-			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing) {
+			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode) {
 				valintamode=true;
 				valintamode();
 				
 				}
 			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
 				frame.setVisible(false);
-				
+				valintamode=false;
 				}
 				if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F10 && capturing) {
 					try {
@@ -238,7 +242,7 @@ public class Main{
 			}
 		});
 	
-		canvas.addMouseListener(new MouseListener() {
+		frame.addMouseListener(new MouseListener() {
 			
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -294,25 +298,6 @@ public class Main{
 		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"),"running");
 		iconMenu(trayIcon);
 
-		
-		
-     
-
-   
-		
-		// tänne sit vaikka ne key listenerit jotka toteuttaa metodit riippuen
-		// keybindista ?
-//
-//		try {
-//			Input i = new Input();
-//			
-//			
-//		} catch (Exception e) {
-//			
-//			e.printStackTrace();
-//		}
-		
-		
 
 	}
 	
