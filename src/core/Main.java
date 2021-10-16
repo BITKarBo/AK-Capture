@@ -294,7 +294,7 @@ public class Main{
 			}
 		});
 		
-		
+		//lol
 		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"),"running");
 		iconMenu(trayIcon);
 
