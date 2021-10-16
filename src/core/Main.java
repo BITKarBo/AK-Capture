@@ -192,13 +192,9 @@ public class Main{
 		frame = new JFrame("AK-Capture");
 		
 		frame.setLayout(new BorderLayout());
-<<<<<<< Upstream, based on origin/main
 		frame.setSize(dim.width, dim.height);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-=======
 		frame.setSize(500, 500);
->>>>>>> a7d11a6 Mouse selection for every direction
-		
 		//frame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		//frame.setUndecorated(true);
 		//frame.setLayout(null);
