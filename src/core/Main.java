@@ -31,6 +31,10 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import lc.kra.system.keyboard.GlobalKeyboardHook;
+import lc.kra.system.keyboard.event.GlobalKeyAdapter;
+import lc.kra.system.keyboard.event.GlobalKeyEvent;
+
 public class Main{
 
 	
@@ -179,7 +183,7 @@ public class Main{
 	}
 	public static void main(String[] args) throws AWTException {
 		alustus();
-		
+		GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 		frame = new JFrame("AK-Capture");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
@@ -194,35 +198,32 @@ public class Main{
 		frame.pack();
 		//frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
-		canvas.addKeyListener(new KeyListener() {
+		
+		keyboardHook.addKeyListener(new GlobalKeyAdapter() {
+			
+		
 			
 			@Override
-			public void keyTyped(KeyEvent e) {
+			public void keyReleased(GlobalKeyEvent e) {
 				// TODO Auto-generated method stub
 				
 			}
 			
 			@Override
-			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void keyPressed(KeyEvent e) {
-				if(e.getKeyCode() == KeyEvent.VK_F9 && !capturing) {
+			public void keyPressed(GlobalKeyEvent e) {
+				if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && !capturing) {
 					try {
 						capture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 				}
-			if(e.getKeyCode() == KeyEvent.VK_F8 && !capturing) {
+			if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing) {
 				valintamode=true;
 				valintamode();
 				
 				}
-				if(e.getKeyCode() == KeyEvent.VK_F10 && capturing) {
+				if(e.getVirtualKeyCode() == GlobalKeyEvent.VK_F10 && capturing) {
 					try {
 						stopCapture();
 					} catch (Exception e1) {
