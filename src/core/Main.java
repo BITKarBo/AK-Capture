@@ -59,7 +59,7 @@ public class Main{
 	//static int kuvamaara = 30;
 	static int kuvaindex = 0;
 	static int delay = 100;
-	
+	static TrayIcon trayIcon;
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	
 
@@ -68,6 +68,7 @@ public class Main{
 	public static void capture(Rectangle rectangle) throws AWTException {
 
 		if (!capturing) {
+			trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
 			frame.setVisible(false);
 			
 			capturing = true;
@@ -104,7 +105,7 @@ public class Main{
 		timer.cancel();
 		alustus();
 		capturing = false;
-		
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
 
 		BufferedImage first = kuvat.get(0);
 		while(new File(output, imageName + kuvaindex + finalformat).exists()) {
@@ -315,7 +316,7 @@ public class Main{
 		});
 		
 		//lol
-		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"),"running");
+		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"),"running");
 		iconMenu(trayIcon);
 
 
