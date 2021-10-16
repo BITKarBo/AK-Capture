@@ -32,7 +32,7 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
 public class Main {
 
-	static private final double UPDATE_CAP = 1.0 / 60.0;
+	static private final double UPDATE_CAP = 1.0 / 255.0;
 	static private final double INTERVAL = .025; // time between screenshots
 
 	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
@@ -50,7 +50,7 @@ public class Main {
 	static String finalformat = ".gif";
 	static String imageName = "image";
 	static File giff = null;
-	static GifWriter writer = null;
+	
 	static Rectangle mouseRect;
 
 	static MenuItem loopp;
@@ -66,7 +66,7 @@ public class Main {
 	
 	public static void capture(Rectangle rectangle) throws Exception {
 		
-		Thread t = new Thread(new Runnable() {
+		Thread ThreadKuva = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
@@ -81,7 +81,7 @@ public class Main {
 					double frameTime = 0;
 					boolean fpslimitter = true;
 					
-					while (capturing || kuvatque.size() > 0) {
+					while (capturing) {
 						
 						firstTime = System.nanoTime()/1000000000.0;
 						passedTime = firstTime - lastTime;
@@ -107,49 +107,58 @@ public class Main {
 							kuvatque.add(robot.createScreenCapture(rectangle));
 						}
 
-						if(kuvatque.peek() != null) {
-							BufferedImage kuva = kuvatque.poll();
-							if(kuvaindex == 1) {
-								int nameindex = 0;
-								while (new File(output, imageName + nameindex + finalformat).exists()) {
-
-									nameindex++;
-								}
-								giff = new File(output, (imageName + nameindex + finalformat).toString());
-								try {
-									writer = new GifWriter(new FileImageOutputStream(giff), kuva.getType(), delay, loop);
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
-							
-							try {
-								writer.writeToSequence(kuva);
-							} catch (IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						} 
-					}
-					
-					try {
-						stopCapture();
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						
 					}
 				}
 				
 			}
 			
 		});
+		Thread ThreadBuffer = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				GifWriter writer = null;
+				while(capturing || kuvatque.peek() != null) {
+					if(kuvatque.peek() != null) {
+						BufferedImage kuva = kuvatque.poll();
+						if(kuvaindex == 1) {
+							int nameindex = 0;
+							while (new File(output, imageName + nameindex + finalformat).exists()) {
+
+								nameindex++;
+							}
+							giff = new File(output, (imageName + nameindex + finalformat).toString());
+							try {
+								writer = new GifWriter(new FileImageOutputStream(giff), kuva.getType(), delay, loop);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						
+						try {
+							writer.writeToSequence(kuva);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					} 
+				}
+				try {
+					writer.close();
+					stopCapture();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 		
-		t.start();
+		ThreadKuva.start();
+		ThreadBuffer.start();
+		
 	}
 
 	public static void stopCapture() throws Exception {
-		writer.close();
+		
+		
 		
 		kuvaindex = 0;
 		capturing = false;
