@@ -32,8 +32,7 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
 public class Main {
 
-	static private final double UPDATE_CAP = 1.0 / 255.0;
-	static private final double INTERVAL = .025; // time between screenshots
+	static private final long INTERVAL = 33; // time between screenshots
 
 	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
@@ -63,7 +62,7 @@ public class Main {
 	
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
-	static int delay = 100;
+	static int delay = 16;
 
 	public static void capture(Rectangle rectangle) throws Exception {
 		valmis = false;
@@ -78,47 +77,28 @@ public class Main {
 			@Override
 			public void run() {
 
-				double firstTime = 0;
-				double lastTime = System.nanoTime() / 1000000000.0;
-				double passedTime = 0;
-				double unprocessedTime = 0;
-				double frameTime = 0;
-				boolean fpslimitter = true;
 
 				while (capturing) {
-
-					firstTime = System.nanoTime() / 1000000000.0;
-					passedTime = firstTime - lastTime;
-					lastTime = firstTime;
-
-					unprocessedTime += passedTime;
-					frameTime += passedTime;
-
-					while (unprocessedTime >= UPDATE_CAP) {
-						unprocessedTime -= UPDATE_CAP;
-
-						if (frameTime >= INTERVAL) {
-							fpslimitter = true;
-							frameTime = 0;
-						}
+					
+					System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
+					
+					kuvaindex++;
+					kuvatque.add(robot.createScreenCapture(rectangle));
+					try {
+						Thread.sleep((int)INTERVAL);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
-					if (capturing && fpslimitter) {
-						fpslimitter = false;
-						System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
-						
-						kuvaindex++;
-						kuvatque.add(robot.createScreenCapture(rectangle));
-					}else {
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
+					
 					}
+			
+					
+					
 
 				}
 				
-			}
+			
 
 		});
 		Thread ThreadBuffer = new Thread(new Runnable() {
