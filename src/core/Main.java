@@ -41,9 +41,9 @@ public class Main {
 
 	static Robot robot;
 
-	static JFrame frame = new JFrame("AK-Capture");;
-	static JLabel label = new JLabel();;
-	static JPanel pane = new JPanel();;
+	static JFrame frame = new JFrame("AK-Capture");
+	static JLabel label = new JLabel();
+	static JPanel pane = new JPanel();
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
 	static String format = ".png";
@@ -107,10 +107,16 @@ public class Main {
 						
 						kuvaindex++;
 						kuvatque.add(robot.createScreenCapture(rectangle));
+					}else {
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
 
 				}
-				capturing = false;
+				
 			}
 
 		});
@@ -143,6 +149,12 @@ public class Main {
 						try {
 							writer.writeToSequence(kuva);
 						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}else {
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
