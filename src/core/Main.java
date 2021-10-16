@@ -295,7 +295,7 @@ public class Main{
 		});
 		
 		
-		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("viina16.png"),"running");
+		TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"),"running");
 		iconMenu(trayIcon);
 
 		
