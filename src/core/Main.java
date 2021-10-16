@@ -12,6 +12,7 @@ import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
@@ -145,12 +146,16 @@ public class Main{
 	}
 	public static void iconMenu(TrayIcon icon) {
         PopupMenu popup = new PopupMenu();
-        MenuItem item = new MenuItem("Preset: High");
+        MenuItem item = new MenuItem("High");
         popup.add(item);
-        MenuItem item2 = new MenuItem("Preset: Medium");
-    
+        ActionListener listen = new PopupActionListener();
+        
+        item.addActionListener(listen);
+        MenuItem item2 = new MenuItem("Medium");
+        item2.addActionListener(listen);
         popup.add(item2);
-        MenuItem item3 = new MenuItem("Preset: Low");
+        MenuItem item3 = new MenuItem("Low");
+        item3.addActionListener(listen);
         popup.add(item3);
 		icon.setPopupMenu(popup);
 		
