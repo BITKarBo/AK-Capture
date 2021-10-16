@@ -125,11 +125,7 @@ public class Main{
 		//
 		//	Kertoo gifin luonnin onnistumisen ja polun sek‰ tyhjent‰‰ tmp
 		//
-		Image image = new ImageIcon("output/"+imageName + finalformat).getImage();
-		 TransferableImage trans = new TransferableImage( image);
-         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-         c.setContents( trans, null );
-	      
+	
 		 
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
@@ -204,6 +200,7 @@ public class Main{
 		JPanel pane = new JPanel();
 		
 		pane.setSize(dim);
+		pane.setLocation(0, -5);
 		pane.add(label);
 		frame.add(pane);
 		frame.setLayout(new BorderLayout());
