@@ -4,6 +4,7 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
@@ -11,6 +12,9 @@ import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -103,7 +107,8 @@ public class Main{
 			
 			kuvaindex++;
 		}
-		ImageOutputStream gif = new FileImageOutputStream(new File(output,(imageName + kuvaindex + finalformat).toString()));
+		File giff =new File(output,(imageName + kuvaindex + finalformat).toString());
+		ImageOutputStream gif = new FileImageOutputStream(giff);
 
 		GifWriter writer = new GifWriter(gif, first.getType(), delay, true);
 		writer.writeToSequence(first);
@@ -120,7 +125,13 @@ public class Main{
 		//
 		//	Kertoo gifin luonnin onnistumisen ja polun sek‰ tyhjent‰‰ tmp
 		//
-		
+		Image image = new ImageIcon("output/"+imageName + finalformat).getImage();
+		 TransferableImage trans = new TransferableImage( image);
+         Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+         c.setContents( trans, null );
+	      
+		 
+
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
 		valintamode=false;
 		kuvaindex = 0;
@@ -181,7 +192,7 @@ public class Main{
 	            System.out.println(e);
 	        }
 	}
-	public static void main(String[] args) throws AWTException {
+	public static void main(String[] args) throws Exception {
 		
 		
 		alustus();
