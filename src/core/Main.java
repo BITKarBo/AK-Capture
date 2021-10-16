@@ -198,8 +198,9 @@ public class Main{
 		label = new JLabel();
 		
 		JPanel pane = new JPanel();
-		
+		dim.setSize(dim.width, dim.height+5);
 		pane.setSize(dim);
+		
 		pane.setLocation(0, -5);
 		pane.add(label);
 		frame.add(pane);
