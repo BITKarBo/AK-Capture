@@ -86,7 +86,7 @@ static boolean done=false;
 		
 		valmis = false;
 		capturing = true;
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.ico"));
 		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
 
@@ -296,7 +296,7 @@ static boolean done=false;
 		capturing = false;
 		// writer.close();
 		stream.close();
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.ico"));
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
 		alustus();
@@ -480,7 +480,7 @@ static boolean done=false;
 			}
 		});
 
-		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"), "running");
+		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"), "Ready");
 		iconMenu(trayIcon);
 
 	}
