@@ -4,9 +4,11 @@ import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Graphics2D;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Robot;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
@@ -18,30 +20,39 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import java.util.ArrayDeque;
+import java.util.Iterator;
 
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
-public class Main {
+public class Main{
 
-	protected static long INTERVAL = 70; // time between screenshots
+	protected static long INTERVAL = 33; // time between screenshots
 
-	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
+	static ArrayDeque< BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 	static ArrayDeque<BufferedImage> kuvatque2 = new ArrayDeque<BufferedImage>();
-	static ArrayDeque<BufferedImage> kuvatque3 = new ArrayDeque<BufferedImage>();
+	static ArrayDeque< BufferedImage> kuvatque3 = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-
+static int korkeus=720;
+static int leveys=1280;
 	static Robot robot;
 
 	static JFrame frame = new JFrame("AK-Capture");
@@ -68,11 +79,11 @@ public class Main {
 static boolean done=false;
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
-	static int delay = 100;
-	public static void createBuffer() {
-		
-	}
+	static int delay = 33;
+	static int kierros=0;
+
 	public static void capture(Rectangle rectangle) throws Exception {
+		
 		valmis = false;
 		capturing = true;
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
@@ -83,21 +94,32 @@ static boolean done=false;
 
 			@Override
 			public void run() {
-int kierros=0;
+
 				while (capturing) {
 					kierros++;
 					long alkuaika = System.nanoTime();
-					//System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
-
+				
+					BufferedImage image=robot.createScreenCapture(rectangle);
+					
+					if(image.getHeight()>720||image.getWidth()>1280) {  //jos image on liian iso niin pienennetään resoa
+			try {
+				image=resizeImage(image, (int)(image.getWidth()/1.5),(int)(image.getHeight()/1.5));
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+				
+					}
 					kuvaindex++;
-					if(kierros==1)
-						kuvatque.add(robot.createScreenCapture(rectangle));
-					else if(kierros==2)
-						kuvatque2.add(robot.createScreenCapture(rectangle));
+					//if(kierros==1)
+						kuvatque.add(image);
+					/*else if(kierros==2)
+						kuvatque2.add(image);
 					else {
 						kierros=0;
-						kuvatque3.add(robot.createScreenCapture(rectangle));
+						kuvatque3.add(image);
 					}
+					*/
 					long loppuaika = System.nanoTime();
 					System.out.println("Lisääntynyt aika : "+(loppuaika-alkuaika)/1000000.0 + "ms");
 					
@@ -116,6 +138,7 @@ int kierros=0;
 			}
 
 		});
+	
 		Thread ThreadBuffer = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -134,11 +157,11 @@ int kierros=0;
 						try {
 							
 								writer.writeToSequence(kuva);
-								Thread.sleep(5);
-						} catch (IOException | InterruptedException e) {
+								
+						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
+						System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
 					} else {
 						try {
 							Thread.sleep(1);
@@ -147,6 +170,14 @@ int kierros=0;
 						}
 					}
 					
+				}
+				try {
+					
+					writer.close();
+					stopCapture();
+					
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			
 			}
@@ -167,7 +198,7 @@ int kierros=0;
 						try {
 							
 							writer.writeToSequence(kuva);
-							Thread.sleep(5);
+							Thread.sleep(10);
 						} catch (IOException | InterruptedException e) {
 							e.printStackTrace();
 						}
@@ -199,12 +230,12 @@ int kierros=0;
 						try {
 							
 								writer.writeToSequence(kuva);
-								Thread.sleep(5);
+								Thread.sleep(10);
 								
 						} catch (IOException | InterruptedException e) {
 							e.printStackTrace();
 						}
-						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
+						System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
 					} else {
 						try {
 							Thread.sleep(1);
@@ -214,14 +245,7 @@ int kierros=0;
 					}
 					
 				}
-				try {
-					
-					writer.close();
-					stopCapture();
-					
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+			
 			}
 		});
 		
@@ -243,6 +267,14 @@ int kierros=0;
 	
 
 	try {
+		try {
+			if(kuva.getHeight()>720||kuva.getWidth()>1280) {
+			kuva=resizeImage(kuva, (int)(kuva.getWidth()/1.5),(int)(kuva.getHeight()/1.5));
+			}
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		writer.writeToSequence(kuva);
 	} catch (IOException e) {
 		e.printStackTrace();
@@ -251,8 +283,8 @@ int kierros=0;
 		
 		ThreadKuva.start();
 		ThreadBuffer.start();
-		ThreadBuffer2.start();
-		ThreadBuffer3.start();
+		//ThreadBuffer2.start();
+		//ThreadBuffer3.start();
 
 	}
 
@@ -332,7 +364,14 @@ int kierros=0;
 			System.out.println(e);
 		}
 	}
-
+	static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+	    BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+	    Graphics2D graphics2D = resizedImage.createGraphics();
+	    graphics2D.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED );
+	    graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+	    graphics2D.dispose();
+	    return resizedImage;
+	}
 	public static void Window() throws AWTException {
 		robot = new Robot();
 

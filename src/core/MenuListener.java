@@ -6,17 +6,17 @@ import java.awt.event.ActionListener;
 class PopupActionListener extends Main implements ActionListener {
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (actionEvent.getActionCommand().equals("High")) {
-			INTERVAL = 60;
-			delay = 60;
+			INTERVAL = 16;
+			delay = 16;
 		}
 
 		if (actionEvent.getActionCommand().equals("Medium")) {
-			INTERVAL = 80;
-			delay = 80;
+			INTERVAL = 33;
+			delay = 33;
 		}
 		if (actionEvent.getActionCommand().equals("Low")) {
-			INTERVAL = 120;
-			delay = 120;
+			INTERVAL = 66;
+			delay = 66;
 
 		}
 		if (actionEvent.getActionCommand().equals("Close")) {
