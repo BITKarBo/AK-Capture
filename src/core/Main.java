@@ -15,6 +15,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -32,9 +34,11 @@ import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
 public class Main {
 
-	static private final long INTERVAL = 33; // time between screenshots
+	protected static long INTERVAL = 70; // time between screenshots
 
 	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
+	static ArrayDeque<BufferedImage> kuvatque2 = new ArrayDeque<BufferedImage>();
+	static ArrayDeque<BufferedImage> kuvatque3 = new ArrayDeque<BufferedImage>();
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -49,7 +53,9 @@ public class Main {
 	static String finalformat = ".gif";
 	static String imageName = "image";
 	static File giff = null;
-
+	static GifWriter writer = null;
+	static int nameindex = 0;
+	
 	static Rectangle mouseRect;
 
 	static MenuItem loopp;
@@ -59,11 +65,13 @@ public class Main {
 	static boolean loop = true; // kuvaus
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
-
+static boolean done=false;
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
-	static int delay = 16;
-
+	static int delay = 100;
+	public static void createBuffer() {
+		
+	}
 	public static void capture(Rectangle rectangle) throws Exception {
 		valmis = false;
 		capturing = true;
@@ -75,15 +83,24 @@ public class Main {
 
 			@Override
 			public void run() {
-
+int kierros=0;
 				while (capturing) {
+					kierros++;
 					long alkuaika = System.nanoTime();
-					System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
+					//System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
 
 					kuvaindex++;
-					kuvatque.add(robot.createScreenCapture(rectangle));
+					if(kierros==1)
+						kuvatque.add(robot.createScreenCapture(rectangle));
+					else if(kierros==2)
+						kuvatque2.add(robot.createScreenCapture(rectangle));
+					else {
+						kierros=0;
+						kuvatque3.add(robot.createScreenCapture(rectangle));
+					}
 					long loppuaika = System.nanoTime();
 					System.out.println("Lisääntynyt aika : "+(loppuaika-alkuaika)/1000000.0 + "ms");
+					
 					try {
 						int aika = (int) (INTERVAL - (loppuaika-alkuaika)/1000000.0);
 						if(aika > 0) {
@@ -103,31 +120,88 @@ public class Main {
 			@Override
 			public void run() {
 
-				GifWriter writer = null;
-				boolean eka = true;
+				
+			
 				while (capturing || kuvatque.peek() != null) {
 					long alkuaika = System.nanoTime();
 					if (kuvatque.peek() != null) {
-						System.out.println("BUFFER QUESIZE: " + kuvatque.size());
 						BufferedImage kuva = kuvatque.poll();
-						if (eka) {
-							eka = false;
-							int nameindex = 0;
-							while (new File(output, imageName + nameindex + finalformat).exists()) {
+						System.out.println("BUFFER QUESIZE: " + kuvatque.size());
+						
+						
 
-								nameindex++;
-							}
-							giff = new File(output, (imageName + nameindex + finalformat).toString());
-							try {
-								writer = new GifWriter(new FileImageOutputStream(giff), kuva.getType(), delay, loop);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
 
 						try {
+							
+								writer.writeToSequence(kuva);
+								Thread.sleep(5);
+						} catch (IOException | InterruptedException e) {
+							e.printStackTrace();
+						}
+						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
+					} else {
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}
+			
+			}
+		});
+		Thread ThreadBuffer2 = new Thread(new Runnable() {
+			@Override
+			public void run() {
+
+		
+		
+				while (capturing || kuvatque2.peek() != null) {
+					long alkuaika = System.nanoTime();
+					if (kuvatque2.peek() != null) {
+						BufferedImage kuva = kuvatque2.poll();
+						System.out.println("BUFFER2 QUESIZE: " + kuvatque2.size());
+
+
+						try {
+							
 							writer.writeToSequence(kuva);
-						} catch (IOException e) {
+							Thread.sleep(5);
+						} catch (IOException | InterruptedException e) {
+							e.printStackTrace();
+						}
+						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
+					} else {
+						try {
+							Thread.sleep(1);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}
+			
+			}
+		});
+		Thread ThreadBuffer3 = new Thread(new Runnable() {
+			@Override
+			 public void run() {
+
+		
+				boolean eka = true;
+				while (capturing || kuvatque3.peek() != null) {
+					long alkuaika = System.nanoTime();
+					if (kuvatque3.peek() != null) {
+						BufferedImage kuva = kuvatque3.poll();
+						System.out.println("BUFFER3 QUESIZE: " + kuvatque3.size());
+	
+						try {
+							
+								writer.writeToSequence(kuva);
+								Thread.sleep(5);
+								
+						} catch (IOException | InterruptedException e) {
 							e.printStackTrace();
 						}
 						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
@@ -141,16 +215,44 @@ public class Main {
 					
 				}
 				try {
+					
 					writer.close();
 					stopCapture();
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		
+		BufferedImage kuva=robot.createScreenCapture(rectangle);
+		
 
+		
+		
+		while (new File(output, imageName + nameindex + finalformat).exists()) {
+
+			nameindex++;
+		}
+		giff = new File(output, (imageName + nameindex + finalformat).toString());
+		try {
+			writer = new GifWriter(new FileImageOutputStream(giff),kuva.getType(), delay, loop);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+
+	try {
+		writer.writeToSequence(kuva);
+	} catch (IOException e) {
+		e.printStackTrace();
+	}
+		
+		
 		ThreadKuva.start();
 		ThreadBuffer.start();
+		ThreadBuffer2.start();
+		ThreadBuffer3.start();
 
 	}
 
@@ -183,6 +285,7 @@ public class Main {
 		// Alustaa kansion jos ei löydy
 		valintamode = false;
 		kuvaindex = 0;
+		done=false;
 		if (!output.exists())
 			output.mkdir();
 	}
