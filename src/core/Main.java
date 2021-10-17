@@ -59,7 +59,7 @@ public class Main {
 	static boolean loop = true; // kuvaus
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
-	
+
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
 	static int delay = 16;
@@ -70,45 +70,43 @@ public class Main {
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.jpg"));
 		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
-		
-		
+
 		Thread ThreadKuva = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-
 				while (capturing) {
-					
+					long alkuaika = System.nanoTime();
 					System.out.println("Capturing: " + kuvaindex + "QUESIZE: " + kuvatque.size());
-					
+
 					kuvaindex++;
 					kuvatque.add(robot.createScreenCapture(rectangle));
+					long loppuaika = System.nanoTime();
+					System.out.println("Lisääntynyt aika : "+(loppuaika-alkuaika)/1000000.0 + "ms");
 					try {
-						Thread.sleep((int)INTERVAL);
+						int aika = (int) (INTERVAL - (loppuaika-alkuaika)/1000000.0);
+						if(aika > 0) {
+							Thread.sleep(aika);
+						}
+						
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-					}
-			
-					
-					
 
 				}
-				
-			
+
+			}
 
 		});
 		Thread ThreadBuffer = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				
+
 				GifWriter writer = null;
 				boolean eka = true;
 				while (capturing || kuvatque.peek() != null) {
-					
+					long alkuaika = System.nanoTime();
 					if (kuvatque.peek() != null) {
 						System.out.println("BUFFER QUESIZE: " + kuvatque.size());
 						BufferedImage kuva = kuvatque.poll();
@@ -132,13 +130,15 @@ public class Main {
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-					}else {
+						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
+					} else {
 						try {
 							Thread.sleep(1);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}
+					
 				}
 				try {
 					writer.close();
@@ -148,7 +148,7 @@ public class Main {
 				}
 			}
 		});
-		
+
 		ThreadKuva.start();
 		ThreadBuffer.start();
 
