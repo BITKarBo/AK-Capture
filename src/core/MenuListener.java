@@ -1,7 +1,10 @@
 package core;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 class PopupActionListener extends Main implements ActionListener {
 	public void actionPerformed(ActionEvent actionEvent) {
@@ -33,6 +36,14 @@ class PopupActionListener extends Main implements ActionListener {
 			loop=true;
 			loopp.setActionCommand("Loop: ON");
 			loopp.setLabel("Loop: ON");
+		}
+		if (actionEvent.getActionCommand().equals("Folder")) {
+			try {
+				Desktop.getDesktop().open(output);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		System.out.println("Selected: " + actionEvent.getActionCommand());
 	}
