@@ -81,7 +81,7 @@ static boolean done=false;
 	static int kuvaindex = 0;
 	static int delay = 33;
 	static int kierros=0;
-
+	static FileImageOutputStream stream;
 	public static void capture(Rectangle rectangle) throws Exception {
 		
 		valmis = false;
@@ -260,7 +260,8 @@ static boolean done=false;
 		}
 		giff = new File(output, (imageName + nameindex + finalformat).toString());
 		try {
-			writer = new GifWriter(new FileImageOutputStream(giff),kuva.getType(), delay, loop);
+			stream=new FileImageOutputStream(giff);
+			writer = new GifWriter(stream,kuva.getType(), delay, loop);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -294,7 +295,7 @@ static boolean done=false;
 		kuvaindex = 0;
 		capturing = false;
 		// writer.close();
-
+		stream.close();
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
