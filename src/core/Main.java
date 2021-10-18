@@ -35,6 +35,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
@@ -47,8 +48,7 @@ public class Main{
 	protected static long INTERVAL = 33; // time between screenshots
 
 	static ArrayDeque< BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
-	static ArrayDeque<BufferedImage> kuvatque2 = new ArrayDeque<BufferedImage>();
-	static ArrayDeque< BufferedImage> kuvatque3 = new ArrayDeque<BufferedImage>();
+
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 static int korkeus=720;
@@ -82,6 +82,7 @@ static boolean done=false;
 	static int delay = 33;
 	static int kierros=0;
 	static FileImageOutputStream stream;
+
 	public static void capture(Rectangle rectangle) throws Exception {
 		
 		valmis = false;
@@ -90,54 +91,8 @@ static boolean done=false;
 		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
 
-		Thread ThreadKuva = new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-
-				while (capturing) {
-					kierros++;
-					long alkuaika = System.nanoTime();
-				
-					BufferedImage image=robot.createScreenCapture(rectangle);
-					
-					if(image.getHeight()>720||image.getWidth()>1280) {  //jos image on liian iso niin pienennetään resoa
-			try {
-				image=resizeImage(image, (int)(image.getWidth()/1.5),(int)(image.getHeight()/1.5));
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-				
-					}
-					kuvaindex++;
-					//if(kierros==1)
-						kuvatque.add(image);
-					/*else if(kierros==2)
-						kuvatque2.add(image);
-					else {
-						kierros=0;
-						kuvatque3.add(image);
-					}
-					*/
-					long loppuaika = System.nanoTime();
-					System.out.println("Lisääntynyt aika : "+(loppuaika-alkuaika)/1000000.0 + "ms");
-					
-					try {
-						int aika = (int) (INTERVAL - (loppuaika-alkuaika)/1000000.0);
-						if(aika > 0) {
-							Thread.sleep(aika);
-						}
-						
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-
-				}
-
-			}
-
-		});
+		Capturer cap=new Capturer(rectangle);
+		Thread rec=new Thread(cap);
 	
 		Thread ThreadBuffer = new Thread(new Runnable() {
 			@Override
@@ -182,72 +137,7 @@ static boolean done=false;
 			
 			}
 		});
-		Thread ThreadBuffer2 = new Thread(new Runnable() {
-			@Override
-			public void run() {
-
-		
-		
-				while (capturing || kuvatque2.peek() != null) {
-					long alkuaika = System.nanoTime();
-					if (kuvatque2.peek() != null) {
-						BufferedImage kuva = kuvatque2.poll();
-						System.out.println("BUFFER2 QUESIZE: " + kuvatque2.size());
-
-
-						try {
-							
-							writer.writeToSequence(kuva);
-							Thread.sleep(10);
-						} catch (IOException | InterruptedException e) {
-							e.printStackTrace();
-						}
-						//System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
-					} else {
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					
-				}
-			
-			}
-		});
-		Thread ThreadBuffer3 = new Thread(new Runnable() {
-			@Override
-			 public void run() {
-
-		
-				boolean eka = true;
-				while (capturing || kuvatque3.peek() != null) {
-					long alkuaika = System.nanoTime();
-					if (kuvatque3.peek() != null) {
-						BufferedImage kuva = kuvatque3.poll();
-						System.out.println("BUFFER3 QUESIZE: " + kuvatque3.size());
 	
-						try {
-							
-								writer.writeToSequence(kuva);
-								Thread.sleep(10);
-								
-						} catch (IOException | InterruptedException e) {
-							e.printStackTrace();
-						}
-						System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
-					} else {
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-					
-				}
-			
-			}
-		});
 		
 		BufferedImage kuva=robot.createScreenCapture(rectangle);
 		
@@ -282,7 +172,7 @@ static boolean done=false;
 	}
 		
 		
-		ThreadKuva.start();
+		rec.start();
 		ThreadBuffer.start();
 		//ThreadBuffer2.start();
 		//ThreadBuffer3.start();
@@ -309,6 +199,7 @@ static boolean done=false;
 
 		frame.setVisible(true);
 		frame.toFront();
+	
 		frame.requestFocus();
 		// todo
 		// tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
