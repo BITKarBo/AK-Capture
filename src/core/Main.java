@@ -2,6 +2,7 @@ package core;
 
 import java.awt.AWTException;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics2D;
@@ -17,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +41,6 @@ import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 import ui.MenuListener;
-
 
 public class Main {
 
@@ -68,13 +69,13 @@ public class Main {
 	protected static MenuItem loopp;
 	protected static MenuItem fpsslider;
 	protected static TrayIcon trayIcon;
-
+	static BufferedImage image;
 	public static boolean capturing = false; // kuvaus
 	protected static boolean loop = true; // kuvaus
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
 	static boolean done = false;
-
+	static BufferedImage näyttö;
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
@@ -82,7 +83,7 @@ public class Main {
 	static int nameindex = 0;
 	static int korkeus = 720;
 	static int leveys = 1280;
-
+	
 	protected static int INTERVAL=33; // time between screenshots & default targetFPS
 	protected static int value = 30; // for fps label and event
 
@@ -153,12 +154,18 @@ public class Main {
 		
 	}
 	public static void valintamode() {
-		label.setIcon(
-				new ImageIcon(robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()))));
-
+	
 		frame.setVisible(true);
 		frame.toFront();
-
+		BufferedImage image = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		Graphics2D g2d = image.createGraphics();
+		g2d.setColor(Color.RED);
+		g2d.drawRect(0, 0, 100, 100);
+		g2d.dispose();
+		label = new JLabel(new ImageIcon(image));
+	    frame.add(label);
+		
+		 frame.pack();
 		frame.requestFocus();
 		// todo
 		// tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
@@ -241,12 +248,7 @@ public class Main {
 	public static void Window() throws AWTException {
 		robot = new Robot();
 
-		dim.setSize(dim.width, dim.height + 5);
-		pane.setSize(dim);
-
-		pane.setLocation(0, -5);
-		pane.add(label);
-		frame.add(pane);
+	
 		frame.setLayout(new BorderLayout());
 		frame.setSize(dim.width, dim.height);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -287,7 +289,41 @@ public class Main {
 				}
 			}
 		});
+		image = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		frame.addMouseMotionListener(new MouseMotionListener() {
 
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				if (valintamode == true) {
+				
+				Graphics2D g2d = image.createGraphics();
+				
+			
+				
+				g2d.setColor(Color.GREEN);
+				//g2d.clearRect(mouseX, mouseY, mouseX2-mouseX, mouseY2-mouseY);
+				
+				mouseX2 = e.getXOnScreen();
+				mouseY2 = e.getYOnScreen();
+				g2d.drawRect(mouseX, mouseY, mouseX2-mouseX, mouseY2-mouseY);
+				g2d.dispose();
+				
+				
+			
+				label.setIcon(new ImageIcon(image));
+				
+				}
+			    
+				
+			}
+
+			@Override
+			public void mouseMoved(MouseEvent e) {
+			
+				
+			}
+			
+		});
 		frame.addMouseListener(new MouseListener() {
 
 			@Override
@@ -322,6 +358,9 @@ public class Main {
 				if (valintamode == true) {
 					mouseX = e.getXOnScreen();
 					mouseY = e.getYOnScreen();
+				
+					
+					
 				}
 
 			}

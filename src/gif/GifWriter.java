@@ -17,12 +17,13 @@ public class GifWriter {
 	public GifWriter(ImageOutputStream out, int imageType, int delay, boolean loop) throws IOException {
 		writer = ImageIO.getImageWritersBySuffix("gif").next();
 		params = writer.getDefaultWriteParam();
-
 		ImageTypeSpecifier imageTypeSpecifier = ImageTypeSpecifier.createFromBufferedImageType(imageType);
 		metadata = writer.getDefaultImageMetadata(imageTypeSpecifier, params);
 
 		configureRootMetadata(delay, loop);
-
+	
+		
+		
 		writer.setOutput(out);
 		writer.prepareWriteSequence(null);
 	}
