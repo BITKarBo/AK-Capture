@@ -8,17 +8,27 @@ import java.io.IOException;
 class PopupActionListener extends Main implements ActionListener {
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (actionEvent.getActionCommand().equals("High")) {
-			INTERVAL = 16;
-			delay = 16;
+			INTERVAL = 20;
+			delay = 20;
+			value=50;
+			fpsslider.setLabel("FPS: "+ value);
+			fpsslider.setActionCommand("FPS: "+ value);
 		}
 
 		if (actionEvent.getActionCommand().equals("Medium")) {
 			INTERVAL = 33;
 			delay = 33;
+			value=30;
+			fpsslider.setLabel("FPS: "+ value);
+			fpsslider.setActionCommand("FPS: "+ value);
 		}
 		if (actionEvent.getActionCommand().equals("Low")) {
+			
 			INTERVAL = 66;
 			delay = 66;
+			value=15;
+			fpsslider.setLabel("FPS: "+ value);
+			fpsslider.setActionCommand("FPS: "+ value);
 
 		}
 		if (actionEvent.getActionCommand().equals("Close")) {
@@ -49,6 +59,8 @@ class PopupActionListener extends Main implements ActionListener {
 			FPS_Slider slider = new FPS_Slider();
 			
 		}
+		
+		
 		System.out.println("Selected: " + actionEvent.getActionCommand());
 	}
 }

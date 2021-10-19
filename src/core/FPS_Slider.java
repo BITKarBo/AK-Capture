@@ -1,7 +1,10 @@
 package core;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -12,7 +15,11 @@ public class FPS_Slider extends Main implements ChangeListener {
 	 */
 	JFrame frame = new JFrame("Choose Framerate");
 	JSlider sliderfps = new JSlider(5,50);
-
+	
+	JPanel pane = new JPanel();
+	
+	 JLabel label = new JLabel("FPS: "+value);
+	 
 	public void setSliderfps(JSlider sliderfps) {
 		this.sliderfps = sliderfps;
 	}
@@ -28,9 +35,9 @@ public class FPS_Slider extends Main implements ChangeListener {
 	    frame.setResizable(false);
 	    frame.setSize(250, 120);
 	    frame.setLocationRelativeTo(null);
-	    
-	    frame.add(sliderfps);
-	    
+	    pane.add(label);
+	    pane.add(sliderfps);
+	    frame.add(pane);
 	    frame.setVisible(true);
 	}
 
@@ -43,6 +50,7 @@ public class FPS_Slider extends Main implements ChangeListener {
 		//System.out.println("NEW FPS: "+ sliderfps.getValue());
 		fpsslider.setLabel("FPS: "+ value);
 		fpsslider.setActionCommand("FPS: "+ value);
+		label.setText("FPS: "+value);
 	}
 
 }
