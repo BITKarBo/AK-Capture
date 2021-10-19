@@ -9,6 +9,13 @@ import core.Main;
 
 public class MenuListener extends Main implements ActionListener {
 	public void actionPerformed(ActionEvent actionEvent) {
+		if (actionEvent.getActionCommand().equals("Timelapse")) {
+			INTERVAL = 2000;
+			delay = 33;
+			value=33;
+			fpsslider.setLabel("FPS: "+ value);
+			fpsslider.setActionCommand("FPS: "+ value);
+		}
 		if (actionEvent.getActionCommand().equals("High")) {
 			INTERVAL = 20;
 			delay = 20;

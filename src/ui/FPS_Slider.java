@@ -1,5 +1,7 @@
 package ui;
 
+import java.awt.Rectangle;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,10 +35,10 @@ public class FPS_Slider extends Main implements ChangeListener {
 		sliderfps.setPaintLabels(true);
 		sliderfps.addChangeListener(this);
 		sliderfps.setValue(value);
-		
+		frame.setLocation(dim.width-280,dim.height-150);
 	    frame.setResizable(false);
 	    frame.setSize(250, 120);
-	    frame.setLocationRelativeTo(null);
+	   
 	    pane.add(label);
 	    pane.add(sliderfps);
 	    frame.add(pane);

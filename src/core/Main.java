@@ -48,7 +48,7 @@ public class Main {
 	protected static BlockingQueue<BufferedImage> kuvatque = new ArrayBlockingQueue<BufferedImage>(300);
 
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
-	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+	protected static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	protected static Robot robot;
 	static JFrame frame = new JFrame("AK-Capture");
 	static JLabel label = new JLabel();
@@ -67,7 +67,7 @@ public class Main {
 	static Rectangle mouseRect;
 	protected static MenuItem loopp;
 	protected static MenuItem fpsslider;
-	static TrayIcon trayIcon;
+	protected static TrayIcon trayIcon;
 
 	public static boolean capturing = false; // kuvaus
 	protected static boolean loop = true; // kuvaus
@@ -133,7 +133,7 @@ public class Main {
 		giff = new File(output, (imageName + nameindex + finalformat).toString());
 		try {
 			stream = new FileImageOutputStream(giff);
-			writer = new GifWriter(stream, kuva.getType(),INTERVAL, loop);
+			writer = new GifWriter(stream, kuva.getType(),delay, loop);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -183,7 +183,10 @@ public class Main {
 		fpsslider = new MenuItem("FPS: "+ value);
 		popup.add(fpsslider);
 		fpsslider.addActionListener(listen);
+		MenuItem itemz = new MenuItem("Timelapse");
+		popup.add(itemz);
 
+		itemz.addActionListener(listen);
 		MenuItem item = new MenuItem("High");
 		popup.add(item);
 
@@ -207,7 +210,6 @@ public class Main {
 		close.addActionListener(listen);
 		popup.add(close);
 		icon.setPopupMenu(popup);
-
 		icon.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

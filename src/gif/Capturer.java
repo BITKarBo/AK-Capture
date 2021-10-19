@@ -1,5 +1,6 @@
 package gif;
 
+import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -16,17 +17,17 @@ public class Capturer extends Main implements Runnable {
 	@Override
 	public void run() {
 		while (capturing) {
-			if(kuvatque.size()>10) {
+			/*if(kuvatque.size()>10) {
 				Buffer buf= new Buffer();
 				Thread ThreadBuffer = new Thread(buf);
 				ThreadBuffer.start();
-			}
+			}*/
 			System.out.println(Thread.activeCount());
 			kierros++;
 			long alkuaika = System.nanoTime();
-
+			
 			BufferedImage image = robot.createScreenCapture(rectangle);
-			image.setAccelerationPriority(0);
+		
 
 			if (image.getHeight() > 720 || image.getWidth() > 1280) { // jos image on liian iso niin pienennetään resoa
 				try {
