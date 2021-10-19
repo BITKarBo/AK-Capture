@@ -17,106 +17,95 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayDeque;
 
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
-import javax.imageio.stream.ImageOutputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import java.util.ArrayDeque;
-import java.util.Iterator;
-
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 
-public class Main{
+public class Main {
 
-	protected static long INTERVAL = 33; // time between screenshots
+	
 
-	static ArrayDeque< BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
+	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
 
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-static int korkeus=720;
-static int leveys=1280;
 	static Robot robot;
-
 	static JFrame frame = new JFrame("AK-Capture");
 	static JLabel label = new JLabel();
 	static JPanel pane = new JPanel();
+
 	static File tmp = new File("tmp/");
 	static File output = new File("output/");
+	static File giff = null;
+
 	static String format = ".png";
 	static String finalformat = ".gif";
 	static String imageName = "image";
-	static File giff = null;
-	static GifWriter writer = null;
-	static int nameindex = 0;
-	
-	static Rectangle mouseRect;
 
+	static GifWriter writer = null;
+	static FileImageOutputStream stream;
+	static Rectangle mouseRect;
 	static MenuItem loopp;
+	static MenuItem fpsslider;
 	static TrayIcon trayIcon;
 
 	static boolean capturing = false; // kuvaus
 	static boolean loop = true; // kuvaus
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
-static boolean done=false;
+	static boolean done = false;
+
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	static int kuvaindex = 0;
 	static int delay = 33;
-	static int kierros=0;
-	static FileImageOutputStream stream;
+	static int kierros = 0;
+	static int nameindex = 0;
+	static int korkeus = 720;
+	static int leveys = 1280;
+	static int targetFPS = 33; 	// default 33 as milliseconds
+	static int INTERVAL; // time between screenshots default targetFPS
+	static int value = 30; // for fps label and event
 
 	public static void capture(Rectangle rectangle) throws Exception {
-		
+
 		valmis = false;
 		capturing = true;
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.ico"));
 		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
 
-		Capturer cap=new Capturer(rectangle);
-		Thread rec=new Thread(cap);
-	
+		Capturer cap = new Capturer(rectangle);
+		Thread rec = new Thread(cap);
+
 		Thread ThreadBuffer = new Thread(new Runnable() {
 			@Override
 			public void run() {
 
-				
-			
 				while (capturing || kuvatque.peek() != null) {
 					long alkuaika = System.nanoTime();
 					if (kuvatque.peek() != null) {
 						BufferedImage kuva = kuvatque.poll();
 						System.out.println("BUFFER QUESIZE: " + kuvatque.size());
-						
-						
-
 
 						try {
-							
-								writer.writeToSequence(kuva);
-								
+
+							writer.writeToSequence(kuva);
+
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
-						System.out.println("BUFFER Time: "+(System.nanoTime()-alkuaika)/1000000.0 + "ms");
+						System.out.println("BUFFER Time: " + (System.nanoTime() - alkuaika) / 1000000.0 + "ms");
 					} else {
 						try {
 							Thread.sleep(1);
@@ -124,58 +113,51 @@ static boolean done=false;
 							e.printStackTrace();
 						}
 					}
-					
+
 				}
 				try {
-					
+
 					writer.close();
 					stopCapture();
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			
+
 			}
 		});
-	
-		
-		BufferedImage kuva=robot.createScreenCapture(rectangle);
-		
 
-		
-		
+		BufferedImage kuva = robot.createScreenCapture(rectangle);
+
 		while (new File(output, imageName + nameindex + finalformat).exists()) {
 
 			nameindex++;
 		}
 		giff = new File(output, (imageName + nameindex + finalformat).toString());
 		try {
-			stream=new FileImageOutputStream(giff);
-			writer = new GifWriter(stream,kuva.getType(), delay, loop);
+			stream = new FileImageOutputStream(giff);
+			writer = new GifWriter(stream, kuva.getType(), targetFPS, loop);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	
 
-	try {
 		try {
-			if(kuva.getHeight()>720||kuva.getWidth()>1280) {
-			kuva=resizeImage(kuva, (int)(kuva.getWidth()/1.5),(int)(kuva.getHeight()/1.5));
+			try {
+				if (kuva.getHeight() > 720 || kuva.getWidth() > 1280) {
+					kuva = resizeImage(kuva, (int) (kuva.getWidth() / 1.5), (int) (kuva.getHeight() / 1.5));
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			writer.writeToSequence(kuva);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		writer.writeToSequence(kuva);
-	} catch (IOException e) {
-		e.printStackTrace();
-	}
-		
-		
+
 		rec.start();
 		ThreadBuffer.start();
-		//ThreadBuffer2.start();
-		//ThreadBuffer3.start();
+		// ThreadBuffer2.start();
+		// ThreadBuffer3.start();
 
 	}
 
@@ -199,7 +181,7 @@ static boolean done=false;
 
 		frame.setVisible(true);
 		frame.toFront();
-	
+
 		frame.requestFocus();
 		// todo
 		// tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
@@ -209,17 +191,23 @@ static boolean done=false;
 		// Alustaa kansion jos ei löydy
 		valintamode = false;
 		kuvaindex = 0;
-		done=false;
+		done = false;
 		if (!output.exists())
 			output.mkdir();
 	}
 
 	public static void iconMenu(TrayIcon icon) {
 
+		ActionListener listen = new PopupActionListener();
 		PopupMenu popup = new PopupMenu();
+
+		
+		fpsslider = new MenuItem("FPS: "+ value);
+		popup.add(fpsslider);
+		fpsslider.addActionListener(listen);
+
 		MenuItem item = new MenuItem("High");
 		popup.add(item);
-		ActionListener listen = new PopupActionListener();
 
 		item.addActionListener(listen);
 		MenuItem item2 = new MenuItem("Medium");
@@ -259,14 +247,17 @@ static boolean done=false;
 			System.out.println(e);
 		}
 	}
-	static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
-	    BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-	    Graphics2D graphics2D = resizedImage.createGraphics();
-	    graphics2D.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED );
-	    graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-	    graphics2D.dispose();
-	    return resizedImage;
+
+	static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight)
+			throws IOException {
+		BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics2D = resizedImage.createGraphics();
+		graphics2D.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_SPEED);
+		graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+		graphics2D.dispose();
+		return resizedImage;
 	}
+
 	public static void Window() throws AWTException {
 		robot = new Robot();
 

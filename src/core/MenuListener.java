@@ -3,7 +3,6 @@ package core;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 
 class PopupActionListener extends Main implements ActionListener {
@@ -41,9 +40,14 @@ class PopupActionListener extends Main implements ActionListener {
 			try {
 				Desktop.getDesktop().open(output);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+		if(actionEvent.getActionCommand().equals("FPS: " + value)) {
+			// Käytössä vammasesti vaa toteutettu :D ei oikeesti unused
+			@SuppressWarnings("unused")
+			FPS_Slider slider = new FPS_Slider();
+			
 		}
 		System.out.println("Selected: " + actionEvent.getActionCommand());
 	}
