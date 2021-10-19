@@ -22,11 +22,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.ImageIcon;
@@ -44,8 +41,6 @@ import ui.MenuListener;
 
 public class Main {
 
-	
-
 	protected static BlockingQueue<BufferedImage> kuvatque = new ArrayBlockingQueue<BufferedImage>(300);
 
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
@@ -54,10 +49,11 @@ public class Main {
 	static JFrame frame = new JFrame("AK-Capture");
 	static JLabel label = new JLabel();
 	static JPanel pane = new JPanel();
-
+	static File endFile;
 	static File tmp = new File("tmp/");
 	protected static File output = new File("output/");
 	static File giff = null;
+	static int CompressionAmount = 200; 	//	30 min - 200 max
 
 	static String format = ".png";
 	static String finalformat = ".gif";
@@ -75,7 +71,12 @@ public class Main {
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
 	static boolean done = false;
+
 	static BufferedImage näyttö;
+
+	static boolean compression = true;
+
+
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
@@ -83,8 +84,12 @@ public class Main {
 	static int nameindex = 0;
 	static int korkeus = 720;
 	static int leveys = 1280;
+
 	
 	protected static int INTERVAL=33; // time between screenshots & default targetFPS
+
+
+
 	protected static int value = 30; // for fps label and event
 
 	public static void capture(Rectangle rectangle) throws Exception {
@@ -98,11 +103,10 @@ public class Main {
 		Capturer cap = new Capturer(rectangle);
 		Thread rec = new Thread(cap);
 
-		Buffer buf= new Buffer();
+		Buffer buf = new Buffer();
 		Thread ThreadBuffer = new Thread(buf);
-		
-		fileFoundation(rectangle);
 
+		fileFoundation(rectangle);
 
 		rec.start();
 		ThreadBuffer.start();
@@ -120,10 +124,21 @@ public class Main {
 		stream.close();
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.ico"));
 
-		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
+		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
 		// tähän sit vaikka se gif luonti tai uus metodi
+
+		//gifin pakkaus
+		if(compression) {
+			String compress = "cmd /c gifsicle.exe --batch --optimize --colors 256 --lossy=" + CompressionAmount + " " + (endFile).toString();
+			Runtime rt = Runtime.getRuntime();
+			Process b = rt.exec(compress, null, output.getAbsoluteFile());
+			
+		}
+		
 	}
+
+
 
 	public static void fileFoundation(Rectangle rectangle) {
 		BufferedImage kuva = robot.createScreenCapture(rectangle);
@@ -131,10 +146,11 @@ public class Main {
 
 			nameindex++;
 		}
+		endFile = new File(imageName + nameindex + finalformat);
 		giff = new File(output, (imageName + nameindex + finalformat).toString());
 		try {
 			stream = new FileImageOutputStream(giff);
-			writer = new GifWriter(stream, kuva.getType(),delay, loop);
+			writer = new GifWriter(stream, kuva.getType(), delay, loop);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -151,8 +167,9 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
+
 	public static void valintamode() {
 	
 		frame.setVisible(true);
@@ -172,7 +189,7 @@ public class Main {
 	}
 
 	public static void alustus() {
-		
+
 		// Alustaa kansion jos ei löydy
 		valintamode = false;
 		kuvaindex = 0;
@@ -186,8 +203,7 @@ public class Main {
 		ActionListener listen = new MenuListener();
 		PopupMenu popup = new PopupMenu();
 
-		
-		fpsslider = new MenuItem("FPS: "+ value);
+		fpsslider = new MenuItem("FPS: " + value);
 		popup.add(fpsslider);
 		fpsslider.addActionListener(listen);
 		MenuItem itemz = new MenuItem("Timelapse");
