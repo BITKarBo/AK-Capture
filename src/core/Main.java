@@ -73,8 +73,8 @@ public class Main {
 	static int nameindex = 0;
 	static int korkeus = 720;
 	static int leveys = 1280;
-	static int targetFPS = 33; 	// default 33 as milliseconds
-	static int INTERVAL=33; // time between screenshots default targetFPS
+
+	static int INTERVAL=33; // time between screenshots & default targetFPS
 	static int value = 30; // for fps label and event
 
 	public static void capture(Rectangle rectangle) throws Exception {
@@ -136,7 +136,7 @@ public class Main {
 		giff = new File(output, (imageName + nameindex + finalformat).toString());
 		try {
 			stream = new FileImageOutputStream(giff);
-			writer = new GifWriter(stream, kuva.getType(), 1000/targetFPS, loop);
+			writer = new GifWriter(stream, kuva.getType(),INTERVAL, loop);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

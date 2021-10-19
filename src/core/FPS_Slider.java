@@ -44,8 +44,9 @@ public class FPS_Slider extends Main implements ChangeListener {
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		value = sliderfps.getValue();
-		targetFPS = (int)(1000 / sliderfps.getValue());
-		INTERVAL = (int)(1000 / sliderfps.getValue());
+		
+		INTERVAL = (int)(1000 / value);
+		delay = (int)(1000 / value);
 		sliderfps.setValue(value);
 		//System.out.println("NEW FPS: "+ sliderfps.getValue());
 		fpsslider.setLabel("FPS: "+ value);
