@@ -1,19 +1,27 @@
-package core;
+package gif;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import core.Main;
+
 public class Capturer extends Main implements Runnable {
 	Rectangle rectangle;
 
-	Capturer(Rectangle rectangle) {
+	public Capturer(Rectangle rectangle) {
 		this.rectangle = rectangle;
 	}
 
 	@Override
 	public void run() {
 		while (capturing) {
+			if(kuvatque.size()>10) {
+				Buffer buf= new Buffer();
+				Thread ThreadBuffer = new Thread(buf);
+				ThreadBuffer.start();
+			}
+			System.out.println(Thread.activeCount());
 			kierros++;
 			long alkuaika = System.nanoTime();
 
@@ -31,8 +39,13 @@ public class Capturer extends Main implements Runnable {
 			}
 			kuvaindex++;
 			// if(kierros==1)
-			kuvatque.add(image);
-
+		
+			try {
+				kuvatque.put(image);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			/*
 			 * else if(kierros==2) kuvatque2.add(image); else { kierros=0;
 			 * kuvatque3.add(image); }

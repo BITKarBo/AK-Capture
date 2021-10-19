@@ -1,4 +1,4 @@
-package core;
+package ui;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -7,6 +7,8 @@ import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import core.Main;
 
 public class FPS_Slider extends Main implements ChangeListener {
 	/**

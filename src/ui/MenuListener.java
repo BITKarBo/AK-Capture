@@ -1,11 +1,13 @@
-package core;
+package ui;
 
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-class PopupActionListener extends Main implements ActionListener {
+import core.Main;
+
+public class MenuListener extends Main implements ActionListener {
 	public void actionPerformed(ActionEvent actionEvent) {
 		if (actionEvent.getActionCommand().equals("High")) {
 			INTERVAL = 20;

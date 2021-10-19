@@ -1,4 +1,4 @@
-package core;
+package gif;
 
 import javax.imageio.*;
 import javax.imageio.metadata.IIOInvalidTreeException;

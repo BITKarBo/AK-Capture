@@ -21,6 +21,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 import javax.imageio.stream.FileImageOutputStream;
 import javax.swing.ImageIcon;
@@ -28,54 +32,59 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import gif.Buffer;
+import gif.Capturer;
+import gif.GifWriter;
 import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
+import ui.MenuListener;
+
 
 public class Main {
 
 	
 
-	static ArrayDeque<BufferedImage> kuvatque = new ArrayDeque<BufferedImage>();
+	protected static BlockingQueue<BufferedImage> kuvatque = new ArrayBlockingQueue<BufferedImage>(300);
 
 	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-	static Robot robot;
+	protected static Robot robot;
 	static JFrame frame = new JFrame("AK-Capture");
 	static JLabel label = new JLabel();
 	static JPanel pane = new JPanel();
 
 	static File tmp = new File("tmp/");
-	static File output = new File("output/");
+	protected static File output = new File("output/");
 	static File giff = null;
 
 	static String format = ".png";
 	static String finalformat = ".gif";
 	static String imageName = "image";
 
-	static GifWriter writer = null;
+	public static GifWriter writer = null;
 	static FileImageOutputStream stream;
 	static Rectangle mouseRect;
-	static MenuItem loopp;
-	static MenuItem fpsslider;
+	protected static MenuItem loopp;
+	protected static MenuItem fpsslider;
 	static TrayIcon trayIcon;
 
-	static boolean capturing = false; // kuvaus
-	static boolean loop = true; // kuvaus
+	public static boolean capturing = false; // kuvaus
+	protected static boolean loop = true; // kuvaus
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
 	static boolean done = false;
 
 	static int mouseX, mouseY, mouseX2, mouseY2;
-	static int kuvaindex = 0;
-	static int delay = 33;
-	static int kierros = 0;
+	protected static int kuvaindex = 0;
+	protected static int delay = 33;
+	public static int kierros = 0;
 	static int nameindex = 0;
 	static int korkeus = 720;
 	static int leveys = 1280;
 
-	static int INTERVAL=33; // time between screenshots & default targetFPS
-	static int value = 30; // for fps label and event
+	protected static int INTERVAL=33; // time between screenshots & default targetFPS
+	protected static int value = 30; // for fps label and event
 
 	public static void capture(Rectangle rectangle) throws Exception {
 
@@ -88,47 +97,35 @@ public class Main {
 		Capturer cap = new Capturer(rectangle);
 		Thread rec = new Thread(cap);
 
-		Thread ThreadBuffer = new Thread(new Runnable() {
-			@Override
-			public void run() {
+		Buffer buf= new Buffer();
+		Thread ThreadBuffer = new Thread(buf);
+		
+		fileFoundation(rectangle);
 
-				while (capturing || kuvatque.peek() != null) {
-					long alkuaika = System.nanoTime();
-					if (kuvatque.peek() != null) {
-						BufferedImage kuva = kuvatque.poll();
-						System.out.println("BUFFER QUESIZE: " + kuvatque.size());
 
-						try {
+		rec.start();
+		ThreadBuffer.start();
+		// ThreadBuffer2.start();
+		// ThreadBuffer3.start();
 
-							writer.writeToSequence(kuva);
+	}
 
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						System.out.println("BUFFER Time: " + (System.nanoTime() - alkuaika) / 1000000.0 + "ms");
-					} else {
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
+	public static void stopCapture() throws Exception {
+		trayIcon.setToolTip("Ready");
+		valmis = true;
+		kuvaindex = 0;
+		capturing = false;
+		// writer.close();
+		stream.close();
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.ico"));
 
-				}
-				try {
+		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
+		alustus();
+		// tähän sit vaikka se gif luonti tai uus metodi
+	}
 
-					writer.close();
-					stopCapture();
-
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-			}
-		});
-
+	public static void fileFoundation(Rectangle rectangle) {
 		BufferedImage kuva = robot.createScreenCapture(rectangle);
-
 		while (new File(output, imageName + nameindex + finalformat).exists()) {
 
 			nameindex++;
@@ -153,28 +150,8 @@ public class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		rec.start();
-		ThreadBuffer.start();
-		// ThreadBuffer2.start();
-		// ThreadBuffer3.start();
-
+		
 	}
-
-	public static void stopCapture() throws Exception {
-		trayIcon.setToolTip("Ready");
-		valmis = true;
-		kuvaindex = 0;
-		capturing = false;
-		// writer.close();
-		stream.close();
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.ico"));
-
-		System.out.println("GIF created at: " + output.getAbsolutePath() + ":" + imageName + finalformat);
-		alustus();
-		// tähän sit vaikka se gif luonti tai uus metodi
-	}
-
 	public static void valintamode() {
 		label.setIcon(
 				new ImageIcon(robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()))));
@@ -188,6 +165,7 @@ public class Main {
 	}
 
 	public static void alustus() {
+		
 		// Alustaa kansion jos ei löydy
 		valintamode = false;
 		kuvaindex = 0;
@@ -198,7 +176,7 @@ public class Main {
 
 	public static void iconMenu(TrayIcon icon) {
 
-		ActionListener listen = new PopupActionListener();
+		ActionListener listen = new MenuListener();
 		PopupMenu popup = new PopupMenu();
 
 		
@@ -248,7 +226,7 @@ public class Main {
 		}
 	}
 
-	static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight)
+	protected static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight)
 			throws IOException {
 		BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
 		Graphics2D graphics2D = resizedImage.createGraphics();
