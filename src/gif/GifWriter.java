@@ -38,8 +38,8 @@ public class GifWriter {
 		graphicsControlExtensionNode.setAttribute("delayTime", Integer.toString(delay / 10));
 		graphicsControlExtensionNode.setAttribute("transparentColorIndex", "0");
 		graphicsControlExtensionNode.setAttribute("transparentColorFlag", "TRUE");
-	
-
+		
+		
 		IIOMetadataNode commentsNode = getNode(root, "CommentExtensions");
 		commentsNode.setAttribute("CommentExtension", "Created by: https://memorynotfound.com");
 
