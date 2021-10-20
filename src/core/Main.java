@@ -6,6 +6,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -209,6 +210,7 @@ public class Main {
 		item.addActionListener(listen);
 		MenuItem item2 = new MenuItem("Medium");
 		item2.addActionListener(listen);
+		item2.setFont(new Font("Arial", Font.BOLD, 13));
 		popup.add(item2);
 		MenuItem item3 = new MenuItem("Low");
 		item3.addActionListener(listen);
