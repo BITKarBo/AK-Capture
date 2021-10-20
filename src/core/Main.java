@@ -1,17 +1,20 @@
 package core;
 
 import java.awt.AWTException;
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Robot;
+import java.awt.Stroke;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -164,18 +167,16 @@ public class Main {
 	public static void valintamode() {
 
 		
-		
-		BufferedImage image2 = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-		image = image2;
-		label = new JLabel(new ImageIcon(image2));
-		
+		image = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+
+	
+		label.setIcon(new ImageIcon(image));
 		frame.add(label);
-		
 		frame.pack();
 		frame.setVisible(true);
 		frame.toFront();
 		frame.requestFocus();
-		label.getGraphics().drawImage(image, 0, 0, label);
+		
 	}
 
 	public static void alustus() {
@@ -303,25 +304,27 @@ public class Main {
 
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
-					label.getGraphics().drawImage(image, 0, 0, label);
-
+					Graphics2D g = (Graphics2D) label.getGraphics();
+					g.setColor(Color.WHITE);
+			
+					g.drawImage(image, 0, 0, label);
+					
 					if (mouseX != mouseX2 || mouseY != mouseY2) {
 						if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0)
-							label.getGraphics().drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY); // 0,0 ->
+							g.drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY); // 0,0 ->
 																										// 1,1
 						else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)
-							label.getGraphics().drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2); // 0,1 ->
+							g.drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2); // 0,1 ->
 																											// 1,0
 						else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)
-							label.getGraphics().drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); // 1,0 ->
+							g.drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); // 1,0 ->
 																											// 0,1
 						else
-							label.getGraphics().drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); // 1,1 ->
+							g.drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); // 1,1 ->
 																											// 0,0
 					}
 				
-
-					label.getGraphics().setColor(Color.GREEN);
+				
 				
 				}
 
@@ -388,7 +391,7 @@ public class Main {
 			}
 		});
 
-		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("catjam.gif"), "Ready");
+		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("idle.gif"), "Ready");
 		iconMenu(trayIcon);
 
 	}
