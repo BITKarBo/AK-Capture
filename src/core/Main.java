@@ -1,6 +1,7 @@
 package core;
 
 import java.awt.AWTException;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -53,7 +54,7 @@ public class Main {
 	static File tmp = new File("tmp/");
 	protected static File output = new File("output/");
 	static File giff = null;
-	static int CompressionAmount = 200; 	//	30 min - 200 max
+	static int CompressionAmount = 80; // 30 min - 200 max
 
 	static String format = ".png";
 	static String finalformat = ".gif";
@@ -76,7 +77,6 @@ public class Main {
 
 	static boolean compression = true;
 
-
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
@@ -85,10 +85,7 @@ public class Main {
 	static int korkeus = 720;
 	static int leveys = 1280;
 
-	
-	protected static int INTERVAL=33; // time between screenshots & default targetFPS
-
-
+	protected static int INTERVAL = 33; // time between screenshots & default targetFPS
 
 	protected static int value = 30; // for fps label and event
 
@@ -110,8 +107,6 @@ public class Main {
 
 		rec.start();
 		ThreadBuffer.start();
-		// ThreadBuffer2.start();
-		// ThreadBuffer3.start();
 
 	}
 
@@ -120,25 +115,21 @@ public class Main {
 		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
-		// writer.close();
 		stream.close();
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.ico"));
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
-		// tähän sit vaikka se gif luonti tai uus metodi
 
-		//gifin pakkaus
-		if(compression) {
-			String compress = "cmd /c gifsicle.exe --batch --optimize --colors 256 --lossy=" + CompressionAmount + " " + (endFile).toString();
+		if (compression) {
+			String compress = "cmd /c gifsicle.exe --batch --optimize --colors 256 --lossy=" + CompressionAmount + " "
+					+ (endFile).toString();
 			Runtime rt = Runtime.getRuntime();
 			Process b = rt.exec(compress, null, output.getAbsoluteFile());
-			
+
 		}
-		
+
 	}
-
-
 
 	public static void fileFoundation(Rectangle rectangle) {
 		BufferedImage kuva = robot.createScreenCapture(rectangle);
@@ -171,21 +162,20 @@ public class Main {
 	}
 
 	public static void valintamode() {
-	
+
+		
+		
+		BufferedImage image2 = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		image = image2;
+		label = new JLabel(new ImageIcon(image2));
+		
+		frame.add(label);
+		
+		frame.pack();
 		frame.setVisible(true);
 		frame.toFront();
-		BufferedImage image = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
-		Graphics2D g2d = image.createGraphics();
-		g2d.setColor(Color.RED);
-		g2d.drawRect(0, 0, 100, 100);
-		g2d.dispose();
-		label = new JLabel(new ImageIcon(image));
-	    frame.add(label);
-		
-		 frame.pack();
 		frame.requestFocus();
-		// todo
-		// tähän se ikkunan valinta tila jonka jälkeen suoritetaan capture metodi
+		label.getGraphics().drawImage(image, 0, 0, label);
 	}
 
 	public static void alustus() {
@@ -264,7 +254,6 @@ public class Main {
 	public static void Window() throws AWTException {
 		robot = new Robot();
 
-	
 		frame.setLayout(new BorderLayout());
 		frame.setSize(dim.width, dim.height);
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -305,40 +294,44 @@ public class Main {
 				}
 			}
 		});
-		image = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+
 		frame.addMouseMotionListener(new MouseMotionListener() {
 
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (valintamode == true) {
+
+					mouseX2 = e.getXOnScreen();
+					mouseY2 = e.getYOnScreen();
+					label.getGraphics().drawImage(image, 0, 0, label);
+
+					if (mouseX != mouseX2 || mouseY != mouseY2) {
+						if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0)
+							label.getGraphics().drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY); // 0,0 ->
+																										// 1,1
+						else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)
+							label.getGraphics().drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2); // 0,1 ->
+																											// 1,0
+						else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)
+							label.getGraphics().drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); // 1,0 ->
+																											// 0,1
+						else
+							label.getGraphics().drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); // 1,1 ->
+																											// 0,0
+					}
 				
-				Graphics2D g2d = image.createGraphics();
-				
-			
-				
-				g2d.setColor(Color.GREEN);
-				//g2d.clearRect(mouseX, mouseY, mouseX2-mouseX, mouseY2-mouseY);
-				
-				mouseX2 = e.getXOnScreen();
-				mouseY2 = e.getYOnScreen();
-				g2d.drawRect(mouseX, mouseY, mouseX2-mouseX, mouseY2-mouseY);
-				g2d.dispose();
-				
-				
-			
-				label.setIcon(new ImageIcon(image));
+
+					label.getGraphics().setColor(Color.GREEN);
 				
 				}
-			    
-				
+
 			}
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
-			
-				
+
 			}
-			
+
 		});
 		frame.addMouseListener(new MouseListener() {
 
@@ -374,9 +367,7 @@ public class Main {
 				if (valintamode == true) {
 					mouseX = e.getXOnScreen();
 					mouseY = e.getYOnScreen();
-				
-					
-					
+
 				}
 
 			}
