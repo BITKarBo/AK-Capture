@@ -17,7 +17,7 @@ public class FPS_Slider extends Main implements ChangeListener {
 	 * Luo ikkunan josta voi valita fps
 	 * Voidaan k‰ytt‰‰ tulevaisuudessa vaikka Asetuksiin
 	 */
-	JFrame frame = new JFrame("Choose Framerate");
+	JFrame frame = new JFrame("Choose FPS");
 	JSlider sliderfps = new JSlider(5,50);
 	
 	JPanel pane = new JPanel();

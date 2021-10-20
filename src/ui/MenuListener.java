@@ -59,16 +59,10 @@ public class MenuListener extends Main implements ActionListener {
 			System.exit(1);
 
 		}
-		if (actionEvent.getActionCommand().equals("Compression: ON")) {
-			compression=false;
-			comp.setActionCommand("Compression: OFF");
-			comp.setLabel("Compression: OFF");
+		if (actionEvent.getActionCommand().equals("Compression...")) {
+			Compress_Slider s = new Compress_Slider();
 		}
-		if (actionEvent.getActionCommand().equals("Compression: OFF")) {
-			compression=true;
-			comp.setActionCommand("Compression: ON");
-			comp.setLabel("Compression: ON");
-		}
+
 		if (actionEvent.getActionCommand().equals("Loop: ON")) {
 			loop=false;
 			loopp.setActionCommand("Loop: OFF");
@@ -85,6 +79,7 @@ public class MenuListener extends Main implements ActionListener {
 			circle.setLabel("Circle: OFF");
 		}
 		if (actionEvent.getActionCommand().equals("Circle: OFF")) {
+			
 			ympyrä=true;
 			circle.setActionCommand("Circle: ON");
 			circle.setLabel("Circle: ON");

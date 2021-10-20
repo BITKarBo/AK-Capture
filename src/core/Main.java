@@ -59,7 +59,7 @@ public class Main {
 	static File tmp = new File("tmp/");
 	protected static File output = new File("output/");
 	static File giff = null;
-	static int CompressionAmount = 200; // 30 min - 200 max
+	protected static int CompressionAmount = 80; // 30 min - 200 max
 
 	static String format = ".png";
 	static String finalformat = ".gif";
@@ -82,7 +82,7 @@ public class Main {
 	protected static boolean ympyrä=false;
 	static BufferedImage näyttö;
 
-	protected static boolean compression = true;
+	
 
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
@@ -128,7 +128,7 @@ public class Main {
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
 
-		if (compression) {
+		if ((CompressionAmount+30)>30) {
 			String compress = "cmd /c gifsicle.exe --batch --optimize --colors 256 --lossy=" + CompressionAmount + " "
 					+ (endFile).toString();
 			Runtime rt = Runtime.getRuntime();
@@ -232,7 +232,7 @@ public class Main {
 		circle.addActionListener(listen);
 		popup.add(circle);
 		
-		comp = new MenuItem("Compression: ON");
+		comp = new MenuItem("Compression...");
 
 		comp.addActionListener(listen);
 		popup.add(comp);
