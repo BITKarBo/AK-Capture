@@ -58,7 +58,7 @@ public class Main {
 	static File tmp = new File("tmp/");
 	protected static File output = new File("output/");
 	static File giff = null;
-	static int CompressionAmount = 80; // 30 min - 200 max
+	static int CompressionAmount = 200; // 30 min - 200 max
 
 	static String format = ".png";
 	static String finalformat = ".gif";
@@ -98,7 +98,7 @@ public class Main {
 
 		valmis = false;
 		capturing = true;
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("rec.ico"));
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
 		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
 
@@ -121,7 +121,7 @@ public class Main {
 		kuvaindex = 0;
 		capturing = false;
 		stream.close();
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.ico"));
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("idle.gif"));
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
