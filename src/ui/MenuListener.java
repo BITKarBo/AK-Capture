@@ -1,6 +1,9 @@
 package ui;
 
 import java.awt.Desktop;
+import java.awt.Font;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -9,12 +12,15 @@ import core.Main;
 
 public class MenuListener extends Main implements ActionListener {
 	public void actionPerformed(ActionEvent actionEvent) {
+		MenuItem og = (MenuItem) actionEvent.getSource();
 		if (actionEvent.getActionCommand().equals("Timelapse")) {
 			INTERVAL = 2000;
 			delay = 33;
 			value=33;
 			fpsslider.setLabel("FPS: "+ value);
 			fpsslider.setActionCommand("FPS: "+ value);
+			clearBalls(actionEvent);
+			og.setFont(new Font("Arial", Font.BOLD, 13));
 		}
 		if (actionEvent.getActionCommand().equals("High")) {
 			INTERVAL = 20;
@@ -22,6 +28,9 @@ public class MenuListener extends Main implements ActionListener {
 			value=50;
 			fpsslider.setLabel("FPS: "+ value);
 			fpsslider.setActionCommand("FPS: "+ value);
+			
+			clearBalls(actionEvent);
+			og.setFont(new Font("Arial", Font.BOLD, 13));
 		}
 
 		if (actionEvent.getActionCommand().equals("Medium")) {
@@ -30,6 +39,8 @@ public class MenuListener extends Main implements ActionListener {
 			value=30;
 			fpsslider.setLabel("FPS: "+ value);
 			fpsslider.setActionCommand("FPS: "+ value);
+			clearBalls(actionEvent);
+			og.setFont(new Font("Arial", Font.BOLD, 13));
 		}
 		if (actionEvent.getActionCommand().equals("Low")) {
 			
@@ -38,12 +49,24 @@ public class MenuListener extends Main implements ActionListener {
 			value=15;
 			fpsslider.setLabel("FPS: "+ value);
 			fpsslider.setActionCommand("FPS: "+ value);
+			clearBalls(actionEvent);
+			og.setFont(new Font("Arial", Font.BOLD, 13));
 
 		}
 		if (actionEvent.getActionCommand().equals("Close")) {
 			System.out.println("Closed");
 			System.exit(1);
 
+		}
+		if (actionEvent.getActionCommand().equals("Compression: ON")) {
+			compression=false;
+			comp.setActionCommand("Compression: OFF");
+			comp.setLabel("Compression: OFF");
+		}
+		if (actionEvent.getActionCommand().equals("Compression: OFF")) {
+			compression=true;
+			comp.setActionCommand("Compression: ON");
+			comp.setLabel("Compression: ON");
 		}
 		if (actionEvent.getActionCommand().equals("Loop: ON")) {
 			loop=false;
@@ -63,13 +86,29 @@ public class MenuListener extends Main implements ActionListener {
 			}
 		}
 		if(actionEvent.getActionCommand().equals("FPS: " + value)) {
-			// Käytössä vammasesti vaa toteutettu :D ei oikeesti unused
+			clearBalls(actionEvent);
+			// KÃ¤ytÃ¶ssÃ¤ vammasesti vaa toteutettu :D ei oikeesti unused
 			@SuppressWarnings("unused")
 			FPS_Slider slider = new FPS_Slider();
+			og.setFont(new Font("Arial", Font.BOLD, 13));
 			
 		}
 		
 		
 		System.out.println("Selected: " + actionEvent.getActionCommand());
+	}
+	
+	void clearBalls(ActionEvent actionEvent) {
+		MenuItem x =(MenuItem) actionEvent.getSource();
+		PopupMenu p = (PopupMenu) x.getParent();
+		for(int i=0;i<p.getItemCount();i++) {
+			MenuItem item =p.getItem(i);
+			item.setFont(new Font("Arial", Font.PLAIN, 13));
+			
+		
+			
+		}
+		
+	
 	}
 }

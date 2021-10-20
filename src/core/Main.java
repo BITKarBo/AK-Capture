@@ -67,6 +67,7 @@ public class Main {
 	static FileImageOutputStream stream;
 	static Rectangle mouseRect;
 	protected static MenuItem loopp;
+	protected static MenuItem comp;
 	protected static MenuItem fpsslider;
 	protected static TrayIcon trayIcon;
 	static BufferedImage image;
@@ -78,7 +79,7 @@ public class Main {
 
 	static BufferedImage näyttö;
 
-	static boolean compression = true;
+	protected static boolean compression = true;
 
 	static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
@@ -199,6 +200,7 @@ public class Main {
 		fpsslider.addActionListener(listen);
 		MenuItem itemz = new MenuItem("Timelapse");
 		popup.add(itemz);
+		
 
 		itemz.addActionListener(listen);
 		MenuItem item = new MenuItem("High");
@@ -216,8 +218,16 @@ public class Main {
 
 		loopp.addActionListener(listen);
 		popup.add(loopp);
+		
+		
+		comp = new MenuItem("Compression: ON");
+
+		comp.addActionListener(listen);
+		popup.add(comp);
+		
 		popup.addSeparator();
 		MenuItem folder = new MenuItem("Folder");
+		
 		folder.addActionListener(listen);
 		popup.add(folder);
 		MenuItem close = new MenuItem("Close");
