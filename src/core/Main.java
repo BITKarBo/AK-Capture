@@ -68,7 +68,7 @@ public class Main {
 	protected static TrayIcon trayIcon;
 	static BufferedImage image;
 	public static boolean capturing = false; // kuvaus
-	protected static boolean loop = true; // kuvaus
+	protected static boolean loop = true; // kuvauslol
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
 	static boolean done = false;
