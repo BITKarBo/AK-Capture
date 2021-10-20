@@ -1,7 +1,12 @@
 package gif;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -27,17 +32,18 @@ public class Capturer extends Main implements Runnable {
 			long alkuaika = System.nanoTime();
 			
 			BufferedImage image = robot.createScreenCapture(rectangle);
-		
-
-			if (image.getHeight() > 720 || image.getWidth() > 1280) { // jos image on liian iso niin pienennetään resoa
-				try {
+			try {
+				if (image.getHeight() > 720 ||image.getWidth() > 1280) {
 					image = resizeImage(image, (int) (image.getWidth() / 1.5), (int) (image.getHeight() / 1.5));
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
-
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
+			if(ympyrä) 
+				image=makeCircle(image);
+			
+
+		
 			kuvaindex++;
 			// if(kierros==1)
 		
@@ -67,5 +73,5 @@ public class Capturer extends Main implements Runnable {
 		}
 
 	}
-
+	 
 }

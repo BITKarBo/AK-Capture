@@ -24,6 +24,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +69,7 @@ public class Main {
 	static FileImageOutputStream stream;
 	static Rectangle mouseRect;
 	protected static MenuItem loopp;
+	protected static MenuItem circle;
 	protected static MenuItem comp;
 	protected static MenuItem fpsslider;
 	protected static TrayIcon trayIcon;
@@ -77,7 +79,7 @@ public class Main {
 	static boolean valintamode = false; // valinta
 	static boolean valmis = true;
 	static boolean done = false;
-
+	protected static boolean ympyrä=false;
 	static BufferedImage näyttö;
 
 	protected static boolean compression = true;
@@ -138,6 +140,17 @@ public class Main {
 
 	public static void fileFoundation(Rectangle rectangle) {
 		BufferedImage kuva = robot.createScreenCapture(rectangle);
+		try {
+			if (kuva.getHeight() > 720 || kuva.getWidth() > 1280) {
+				kuva = resizeImage(kuva, (int) (kuva.getWidth() / 1.5), (int) (kuva.getHeight() / 1.5));
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if(ympyrä) 
+			kuva=makeCircle(kuva);
+		
+		
 		while (new File(output, imageName + nameindex + finalformat).exists()) {
 
 			nameindex++;
@@ -152,13 +165,7 @@ public class Main {
 		}
 
 		try {
-			try {
-				if (kuva.getHeight() > 720 || kuva.getWidth() > 1280) {
-					kuva = resizeImage(kuva, (int) (kuva.getWidth() / 1.5), (int) (kuva.getHeight() / 1.5));
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+			
 			writer.writeToSequence(kuva);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -169,7 +176,7 @@ public class Main {
 	public static void valintamode() {
 
 		
-		image = robot.createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+		image = robot.createScreenCapture(new Rectangle(dim.width*2,dim.height));
 
 	
 		label.setIcon(new ImageIcon(image));
@@ -220,7 +227,10 @@ public class Main {
 
 		loopp.addActionListener(listen);
 		popup.add(loopp);
-		
+		circle = new MenuItem("Circle: OFF");
+
+		circle.addActionListener(listen);
+		popup.add(circle);
 		
 		comp = new MenuItem("Compression: ON");
 
@@ -317,30 +327,38 @@ public class Main {
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
 					Graphics2D g = (Graphics2D) label.getGraphics();
-					g.setColor(Color.WHITE);
-			
+					g.setColor(Color.GREEN);
 					g.drawImage(image, 0, 0, label);
 					
 					if (mouseX != mouseX2 || mouseY != mouseY2) {
-						if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0)
-							g.drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY); // 0,0 ->
-																										// 1,1
-						else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)
-							g.drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2); // 0,1 ->
-																											// 1,0
-						else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)
-							g.drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); // 1,0 ->
-																											// 0,1
-						else
-							g.drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); // 1,1 ->
-																											// 0,0
-					}
-				
-				
+						if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
+							if(!ympyrä) g.drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+							if(ympyrä) g.drawOval(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+
+							//g.setColor(new Color(10,10,50,80));
+							//g.fillRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+						}
+																								
+						else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0) {
+							if(!ympyrä) g.drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+							if(ympyrä) g.drawOval(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+							
+						}
+							
+						else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0) {
+							if(!ympyrä) g.drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+							if(ympyrä) g.drawOval(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+						
+						}
+						else {
+							if(!ympyrä) g.drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); 
+							if(ympyrä) g.drawOval(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); 
+				            
+						}
 				
 				}
 
-			}
+			}}
 
 			@Override
 			public void mouseMoved(MouseEvent e) {
@@ -407,7 +425,24 @@ public class Main {
 		iconMenu(trayIcon);
 
 	}
-
+	   public static BufferedImage makeCircle(BufferedImage image) {
+	        int w = image.getWidth();
+	        int h = image.getHeight();
+	        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+	 
+	        Graphics2D g2 = output.createGraphics();
+	 
+	        g2.setComposite(AlphaComposite.Src);
+	        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	        g2.setColor(Color.WHITE);
+	        g2.fill(new Ellipse2D.Double(0, 0, image.getWidth(), image.getHeight()));
+	        g2.setComposite(AlphaComposite.SrcAtop);
+	        g2.drawImage(image, 0, 0, null);
+	 
+	        g2.dispose();
+	 
+	        return output;
+	    }
 	public static void main(String[] args) throws Exception {
 
 		alustus();

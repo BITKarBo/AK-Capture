@@ -11,6 +11,7 @@ import java.io.IOException;
 import core.Main;
 
 public class MenuListener extends Main implements ActionListener {
+
 	public void actionPerformed(ActionEvent actionEvent) {
 		MenuItem og = (MenuItem) actionEvent.getSource();
 		if (actionEvent.getActionCommand().equals("Timelapse")) {
@@ -77,6 +78,16 @@ public class MenuListener extends Main implements ActionListener {
 			loop=true;
 			loopp.setActionCommand("Loop: ON");
 			loopp.setLabel("Loop: ON");
+		}
+		if (actionEvent.getActionCommand().equals("Circle: ON")) {
+			ympyrä=false;
+			circle.setActionCommand("Circle: OFF");
+			circle.setLabel("Circle: OFF");
+		}
+		if (actionEvent.getActionCommand().equals("Circle: OFF")) {
+			ympyrä=true;
+			circle.setActionCommand("Circle: ON");
+			circle.setLabel("Circle: ON");
 		}
 		if (actionEvent.getActionCommand().equals("Folder")) {
 			try {
