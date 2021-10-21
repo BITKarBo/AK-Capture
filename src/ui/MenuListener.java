@@ -60,6 +60,7 @@ public class MenuListener extends Main implements ActionListener {
 
 		}
 		if (actionEvent.getActionCommand().equals("Compression...")) {
+			@SuppressWarnings("unused")
 			Compress_Slider s = new Compress_Slider();
 		}
 

@@ -2,20 +2,17 @@ package core;
 
 import java.awt.AWTException;
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Robot;
-import java.awt.Stroke;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
@@ -49,49 +46,48 @@ public class Main {
 
 	protected static BlockingQueue<BufferedImage> kuvatque = new ArrayBlockingQueue<BufferedImage>(300);
 
-	static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
+	protected static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	protected static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	protected static Robot robot;
-	static JFrame frame = new JFrame("AK-Capture");
-	static JLabel label = new JLabel();
-	static JPanel pane = new JPanel();
-	static File endFile;
-	static File tmp = new File("tmp/");
+	protected static JFrame frame = new JFrame("AK-Capture");
+	protected static JLabel label = new JLabel();
+	protected static JPanel pane = new JPanel();
+	protected static File endFile;
+	protected static File giff = null;
+	protected static File res = new File("res/");
 	protected static File output = new File("output/");
-	static File giff = null;
+	
 	protected static int CompressionAmount = 80; // 30 min - 200 max
 
-	static String format = ".png";
-	static String finalformat = ".gif";
-	static String imageName = "image";
+	protected static String format = ".png";
+	protected static String finalformat = ".gif";
+	protected static String imageName = "image";
 
-	public static GifWriter writer = null;
-	static FileImageOutputStream stream;
-	static Rectangle mouseRect;
+	protected static GifWriter writer = null;
+	protected static FileImageOutputStream stream;
+	protected static Rectangle mouseRect;
 	protected static MenuItem loopp;
 	protected static MenuItem circle;
 	protected static MenuItem comp;
 	protected static MenuItem fpsslider;
 	protected static TrayIcon trayIcon;
-	static BufferedImage image;
-	static BufferedImage image2;
-	public static boolean capturing = false; // kuvaus
-	protected static boolean loop = true; // kuvauslol
-	static boolean valintamode = false; // valinta
-	static boolean valmis = true;
-	static boolean done = false;
-	protected static boolean ympyrä=false;
-	static BufferedImage näyttö;
-
+	protected static BufferedImage image;
+	protected static BufferedImage image2;
 	
-
-	static int mouseX, mouseY, mouseX2, mouseY2;
+	protected static boolean capturing = false; // kuvaus
+	protected static boolean loop = true; // kuvauslol
+	protected static boolean valintamode = false; // valinta
+	protected static boolean valmis = true;
+	protected static boolean done = false;
+	protected static boolean ympyrä=false;
+	
+	protected static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
-	public static int kierros = 0;
-	static int nameindex = 0;
-	static int korkeus = 720;
-	static int leveys = 1280;
+	protected  static int kierros = 0;
+	protected static int nameindex = 0;
+	protected static int korkeus = 720;
+	protected static int leveys = 1280;
 
 	protected static int INTERVAL = 33; // time between screenshots & default targetFPS
 
@@ -131,9 +127,11 @@ public class Main {
 
 		if ((CompressionAmount+30)>30) {
 			String compress = "cmd /c gifsicle.exe --batch --optimize --colors 256 --lossy=" + CompressionAmount + " "
-					+ (endFile).toString();
+					+ ("../" + output + "/" + endFile).toString();
+			System.out.println(compress);
 			Runtime rt = Runtime.getRuntime();
-			Process b = rt.exec(compress, null, output.getAbsoluteFile());
+			@SuppressWarnings("unused")
+			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
 		}
 
@@ -177,7 +175,7 @@ public class Main {
 	public static void valintamode() {
 
 		
-		image = robot.createScreenCapture(new Rectangle(dim.width*2,dim.height));
+		image = robot.createScreenCapture(new Rectangle(dim.width*2,dim.height*2));
 		
 	
 		label.setIcon(new ImageIcon(image));
