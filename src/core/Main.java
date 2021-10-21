@@ -95,7 +95,7 @@ public class Main {
 
 	protected static int INTERVAL = 33; // time between screenshots & default targetFPS
 
-	protected static int value = 30; // for fps label and event
+	protected static double value = 30; // for fps label and event
 
 	public static void capture(Rectangle rectangle) throws Exception {
 
@@ -333,7 +333,6 @@ public class Main {
 					mouseY2 = e.getYOnScreen();
 					Graphics2D g = (Graphics2D) label.getGraphics();
 				
-				
 					g.drawImage(image, 0, 0, label);
 			
 					g.setColor(Color.CYAN);
@@ -350,7 +349,7 @@ public class Main {
 								g.drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
 								g.setColor(new Color(0,0,0,50));
 								g.fillRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
-							
+
 							}
 							
 

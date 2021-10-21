@@ -17,7 +17,7 @@ public class MenuListener extends Main implements ActionListener {
 		if (actionEvent.getActionCommand().equals("Timelapse")) {
 			INTERVAL = 2000;
 			delay = 33;
-			value=33;
+			value=0.5;
 			fpsslider.setLabel("FPS: "+ value);
 			fpsslider.setActionCommand("FPS: "+ value);
 			clearBalls(actionEvent);

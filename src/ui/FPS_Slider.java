@@ -34,7 +34,7 @@ public class FPS_Slider extends Main implements ChangeListener {
 		sliderfps.setPaintTicks(true);
 		sliderfps.setPaintLabels(true);
 		sliderfps.addChangeListener(this);
-		sliderfps.setValue(value);
+		sliderfps.setValue((int) value);
 		frame.setLocation(dim.width-280,dim.height-150);
 	    frame.setResizable(false);
 	    frame.setSize(250, 120);
@@ -51,7 +51,7 @@ public class FPS_Slider extends Main implements ChangeListener {
 		
 		INTERVAL = (int)(1000 / value);
 		delay = (int)(1000 / value);
-		sliderfps.setValue(value);
+		sliderfps.setValue((int) value);
 		//System.out.println("NEW FPS: "+ sliderfps.getValue());
 		fpsslider.setLabel("FPS: "+ value);
 		fpsslider.setActionCommand("FPS: "+ value);
