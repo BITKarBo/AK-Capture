@@ -119,7 +119,7 @@ public class Main {
 		kuvaindex = 0;
 		capturing = false;
 		stream.close();
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("idle.gif"));
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/idle.gif"));
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
@@ -472,7 +472,7 @@ public class Main {
 			}
 		});
 
-		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("idle.gif"), "Ready");
+		trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage("res/idle.gif"), "Ready");
 		iconMenu(trayIcon);
 
 	}
