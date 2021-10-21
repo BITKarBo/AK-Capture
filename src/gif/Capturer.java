@@ -46,7 +46,7 @@ public class Capturer extends Main implements Runnable {
 		
 			try {
 				kuvatque.put(image);
-				if(kuvatque.size() > 25) {
+				if(kuvatque.size() > 270) {
 					trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/overbuffer.gif"));
 					trayIcon.setToolTip("Cant keep up");
 				}

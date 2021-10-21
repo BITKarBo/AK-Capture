@@ -56,8 +56,9 @@ public class Main {
 	protected static File giff = null;
 	protected static File res = new File("res/");
 	protected static File output = new File("output/");
-	
-	protected static int CompressionAmount = 80; // 30 min - 200 max
+	protected static int CompressionAmount = 50; // 30 min - 200 max
+
+
 
 	protected static String format = ".png";
 	protected static String finalformat = ".gif";
@@ -177,12 +178,14 @@ public class Main {
 		
 	
 		label.setIcon(new ImageIcon(image));
-		frame.add(label);
 		
+		frame.add(label);
 		frame.pack();
 		Graphics2D g = (Graphics2D) image.getGraphics();
+		
 		g.setColor(new Color(0,0,0,50));
 		g.fillRect(0, 0,image.getWidth(),image.getHeight());
+		
 		frame.setVisible(true);
 		frame.toFront();
 		frame.requestFocus();
@@ -205,7 +208,7 @@ public class Main {
 
 		ActionListener listen = new MenuListener();
 		PopupMenu popup = new PopupMenu();
-
+	
 		fpsslider = new MenuItem("FPS: " + value);
 		popup.add(fpsslider);
 		fpsslider.addActionListener(listen);
@@ -332,9 +335,13 @@ public class Main {
 					Graphics2D g = (Graphics2D) label.getGraphics();
 					System.out.println();
 					g.drawImage(image, 0, 0, label);
+			
+					g.setColor(Color.WHITE);
+
 					g.setColor(Color.WHITE);
 					g.drawString("Size: " + (mouseX2 - mouseX) + ", " + (mouseY2 - mouseY), mouseX2, mouseY2);
 					g.setColor(Color.CYAN);
+
 					if (mouseX != mouseX2 || mouseY != mouseY2) {
 						
 						if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
