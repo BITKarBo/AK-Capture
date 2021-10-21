@@ -114,18 +114,19 @@ public class Main {
 	}
 
 	public static void stopCapture() throws Exception {
-		trayIcon.setToolTip("Ready");
+		
 		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
 		stream.close();
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/idle.gif"));
+		System.gc();
+	
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
 
 		if ((CompressionAmount+30)>30) {
-			String compress = "cmd /c gifsicle.exe --batch --optimize=O3 --colors 256 --lossy=" + CompressionAmount + " "
+			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --colors 256 --lossy=" + CompressionAmount+30 + " "
 					+ ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
 			Runtime rt = Runtime.getRuntime();
@@ -133,6 +134,8 @@ public class Main {
 			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
 		}
+		trayIcon.setToolTip("Ready");
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/idle.gif"));
 
 	}
 
