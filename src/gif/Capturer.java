@@ -1,6 +1,7 @@
 package gif;
 
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -10,6 +11,8 @@ public class Capturer extends Main implements Runnable {
 	Rectangle rectangle;
 
 	public Capturer(Rectangle rectangle) {
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/rec.gif"));
+		trayIcon.setToolTip("Capturing...");
 		this.rectangle = rectangle;
 	}
 
@@ -43,9 +46,12 @@ public class Capturer extends Main implements Runnable {
 		
 			try {
 				kuvatque.put(image);
+				if(kuvatque.size() > 25) {
+					trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/overbuffer.gif"));
+					trayIcon.setToolTip("Cant keep up");
+				}
 			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				
 			}
 			/*
 			 * else if(kierros==2) kuvatque2.add(image); else { kierros=0;
@@ -65,6 +71,8 @@ public class Capturer extends Main implements Runnable {
 			}
 
 		}
+		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/buffering16.gif"));
+		trayIcon.setToolTip("Buffering...");
 
 	}
 	 

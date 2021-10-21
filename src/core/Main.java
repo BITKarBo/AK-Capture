@@ -84,7 +84,7 @@ public class Main {
 	protected static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
-	protected  static int kierros = 0;
+	protected static int kierros = 0;
 	protected static int nameindex = 0;
 	protected static int korkeus = 720;
 	protected static int leveys = 1280;
@@ -97,8 +97,6 @@ public class Main {
 
 		valmis = false;
 		capturing = true;
-		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("catjam.gif"));
-		trayIcon.setToolTip("Capturing...");
 		frame.setVisible(false);
 
 		Capturer cap = new Capturer(rectangle);
@@ -126,7 +124,7 @@ public class Main {
 		alustus();
 
 		if ((CompressionAmount+30)>30) {
-			String compress = "cmd /c gifsicle.exe --batch --optimize --colors 256 --lossy=" + CompressionAmount + " "
+			String compress = "cmd /c gifsicle.exe --batch --optimize=O3 --colors 256 --lossy=" + CompressionAmount + " "
 					+ ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
 			Runtime rt = Runtime.getRuntime();
@@ -199,6 +197,8 @@ public class Main {
 		done = false;
 		if (!output.exists())
 			output.mkdir();
+		if (!res.exists())
+			res.mkdir();
 	}
 
 	public static void iconMenu(TrayIcon icon) {
@@ -330,9 +330,10 @@ public class Main {
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
 					Graphics2D g = (Graphics2D) label.getGraphics();
-				
+					System.out.println();
 					g.drawImage(image, 0, 0, label);
-			
+					g.setColor(Color.WHITE);
+					g.drawString("Size: " + (mouseX2 - mouseX) + ", " + (mouseY2 - mouseY), mouseX2, mouseY2);
 					g.setColor(Color.CYAN);
 					if (mouseX != mouseX2 || mouseY != mouseY2) {
 						
