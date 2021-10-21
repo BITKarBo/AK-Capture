@@ -74,6 +74,7 @@ public class Main {
 	protected static MenuItem fpsslider;
 	protected static TrayIcon trayIcon;
 	static BufferedImage image;
+	static BufferedImage image2;
 	public static boolean capturing = false; // kuvaus
 	protected static boolean loop = true; // kuvauslol
 	static boolean valintamode = false; // valinta
@@ -177,11 +178,15 @@ public class Main {
 
 		
 		image = robot.createScreenCapture(new Rectangle(dim.width*2,dim.height));
-
+		
 	
 		label.setIcon(new ImageIcon(image));
 		frame.add(label);
+		
 		frame.pack();
+		Graphics2D g = (Graphics2D) image.getGraphics();
+		g.setColor(new Color(0,0,0,50));
+		g.fillRect(0, 0,image.getWidth(),image.getHeight());
 		frame.setVisible(true);
 		frame.toFront();
 		frame.requestFocus();
@@ -327,32 +332,73 @@ public class Main {
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
 					Graphics2D g = (Graphics2D) label.getGraphics();
-					g.setColor(Color.GREEN);
+				
+				
 					g.drawImage(image, 0, 0, label);
-					
+			
+					g.setColor(Color.CYAN);
 					if (mouseX != mouseX2 || mouseY != mouseY2) {
+						
 						if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
-							if(!ympyrä) g.drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
-							if(ympyrä) g.drawOval(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+							if(ympyrä) {
+								g.drawOval(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+								g.setColor(new Color(0,0,0,50));
+								g.fillOval(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+								}
+							if(!ympyrä) {
+								
+								g.drawRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+								g.setColor(new Color(0,0,0,50));
+								g.fillRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+							
+							}
+							
 
-							//g.setColor(new Color(10,10,50,80));
-							//g.fillRect(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY);
+							
+							
 						}
 																								
 						else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0) {
-							if(!ympyrä) g.drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
-							if(ympyrä) g.drawOval(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+							if(ympyrä) {
+								g.drawOval(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+								g.setColor(new Color(0,0,0,50));
+								g.fillOval(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+							}
+							if(!ympyrä) {
+								g.drawRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+								g.setColor(new Color(0,0,0,50));
+								g.fillRect(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2);
+							}
+							
 							
 						}
 							
 						else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0) {
-							if(!ympyrä) g.drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
-							if(ympyrä) g.drawOval(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+							if(ympyrä) {
+								g.drawOval(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+								g.setColor(new Color(0,0,0,50));;
+								g.fillOval(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+							}
+							if(!ympyrä) {
+								g.drawRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+								g.setColor(new Color(0,0,0,50));
+								g.fillRect(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY); 
+							}
+							
 						
 						}
 						else {
-							if(!ympyrä) g.drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); 
-							if(ympyrä) g.drawOval(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); 
+							if(ympyrä) {
+								g.drawOval(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2);
+								g.setColor(new Color(0,0,0,50));
+								g.fillOval(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2);
+							}
+							if(!ympyrä) {
+								g.drawRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); 
+								g.setColor(new Color(0,0,0,50));
+								g.fillRect(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2); 
+							}
+							 
 				            
 						}
 				
