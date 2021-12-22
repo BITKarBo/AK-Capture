@@ -98,8 +98,8 @@ public class Main {
 	protected static int korkeus = 720;
 	protected static int leveys = 1280;
 	protected static Timer stats;
-	public static int buf = 1; // 1 = javaWriter FAST! WITH QUANTIZIZERIINO
-	public static int colorizer = 4;// eri v‰ri pakkaus algoritmeja 1-3, muut arvot default ei tee mit‰‰n
+	protected static int buf = 1; // 1 = javaWriter FAST! WITH QUANTIZIZERIINO
+	protected static int colorizer = 0;// eri v‰ri pakkaus algoritmeja 1-3, muut arvot default ei tee mit‰‰n
 
 	protected static int frames = 0;
 	protected static int INTERVAL = 33; // time between screenshots & default targetFPS
@@ -114,7 +114,6 @@ public class Main {
 		stats = new Timer();
 		stats.scheduleAtFixedRate(new TimerTask() {
 			@Override
-
 			public void run() {
 				System.out.printf(
 						"#########################################################################%n"
@@ -160,7 +159,7 @@ public class Main {
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
 		alustus();
 
-		if (((CompressionAmount + 30) > 30) && colorizer < 3) {
+		if (((CompressionAmount + 30) > 30) && colorizer == 0) {
 			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --lossy=" + (CompressionAmount + 30) + " "
 					+ ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
@@ -199,6 +198,9 @@ public class Main {
 		// kaikki tekee saman eritavalla :D 3mode ois kuulema paras
 		switch (colorizer) {
 		case 0:
+			return sourceBufferedImage;
+		
+		case 1:
 
 			ColorModel cm = indexedImage.getColorModel();
 			IndexColorModel icm = (IndexColorModel) cm;
@@ -218,17 +220,17 @@ public class Main {
 			indexedImage = new BufferedImage(icm2, raster, sourceBufferedImage.isAlphaPremultiplied(), null);
 			indexedImage.getGraphics().drawImage(sourceBufferedImage, 0, 0, null);
 			break;
-		case 1:
+		case 2:
 			Graphics2D g = indexedImage.createGraphics();
 			RenderingHints hints = new RenderingHints(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
 			RescaleOp op = new RescaleOp(1.0f, 0.0f, hints); // do nothing!
 			g.drawImage(sourceBufferedImage, op, 1, 1);
 			break;
-		case 2:
+		case 3:
 			ColorConvertOp op2 = new ColorConvertOp(null);
 			indexedImage = op2.filter(sourceBufferedImage, indexedImage);
 			break;
-		case 3:
+		case 4:
 			// t‰‰ tarvii extra libraryn
 //			PlanarImage indexedImage3 = ColorQuantizerDescriptor.create(sourceBufferedImage,ColorQuantizerDescriptor.MEDIANCUT,256,32768,null,1,1,null);
 //			break;
