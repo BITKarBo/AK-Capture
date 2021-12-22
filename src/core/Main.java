@@ -389,7 +389,7 @@ public class Main {
 
 			@Override
 			public void keyReleased(GlobalKeyEvent e) {
-				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_B&& capturing) {
+				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_MENU&& capturing) {
 					following=false;
 					System.out.println("No longer following");
 				}
