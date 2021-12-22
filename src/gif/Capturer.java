@@ -79,6 +79,7 @@ public class Capturer extends Main implements Runnable {
 			}
 
 		}
+		
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/buffering16.gif"));
 		trayIcon.setToolTip("Buffering...");
 

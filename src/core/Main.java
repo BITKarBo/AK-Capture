@@ -160,7 +160,7 @@ public class Main {
 		alustus();
 
 		if (((CompressionAmount + 30) > 30) && colorizer == 0) {
-			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --lossy=" + (CompressionAmount + 30) + " "
+			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --color=256 --lossy=" + (CompressionAmount + 30) + " "
 					+ ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
 			Runtime rt = Runtime.getRuntime();
@@ -168,7 +168,7 @@ public class Main {
 			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
 		} else {
-			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --color=256 --lossy=" + (CompressionAmount + 30)
+			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --lossy=" + (CompressionAmount + 30)
 					+ " " + ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
 			Runtime rt = Runtime.getRuntime();
@@ -176,6 +176,7 @@ public class Main {
 			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
 		}
+		Thread.sleep(100);
 		trayIcon.setToolTip("Ready");
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/idle.gif"));
 		stats.cancel();
