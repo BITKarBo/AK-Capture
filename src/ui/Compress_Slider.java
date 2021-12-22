@@ -17,7 +17,7 @@ public class Compress_Slider extends Main implements ChangeListener {
 	JFrame frame = new JFrame("Compression & Quantiziser");
 	JSlider slider = new JSlider(0, 170);
 
-	JSlider sliderColor = new JSlider(0, 3);
+	JSlider sliderColor = new JSlider(0, 2);
 
 	JLabel labelColor = new JLabel("Colorizer: " + colorizer);
 

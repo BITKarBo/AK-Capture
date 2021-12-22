@@ -229,10 +229,6 @@ public class Main {
 			RescaleOp op = new RescaleOp(1.0f, 0.0f, hints); // do nothing!
 			g.drawImage(sourceBufferedImage, op, 1, 1);
 			break;
-		case 3:
-			ColorConvertOp op2 = new ColorConvertOp(null);
-			indexedImage = op2.filter(sourceBufferedImage, indexedImage);
-			break;
 		case 4:
 			// t‰‰ tarvii extra libraryn
 //			PlanarImage indexedImage3 = ColorQuantizerDescriptor.create(sourceBufferedImage,ColorQuantizerDescriptor.MEDIANCUT,256,32768,null,1,1,null);
