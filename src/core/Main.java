@@ -167,7 +167,9 @@ public class Main {
 			@SuppressWarnings("unused")
 			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
-		} else {
+
+		} else if(((CompressionAmount + 30) > 30)){
+
 			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --lossy=" + (CompressionAmount + 30)
 					+ " " + ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
