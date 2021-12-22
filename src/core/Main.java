@@ -89,7 +89,7 @@ public class Main {
 	protected static boolean valmis = true;
 	protected static boolean done = false;
 	protected static boolean ympyrä = false;
-
+	public static boolean following=false;
 	protected static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
@@ -149,7 +149,7 @@ public class Main {
 	}
 
 	public static void stopCapture() throws Exception {
-
+		following=false;
 		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
@@ -389,7 +389,10 @@ public class Main {
 
 			@Override
 			public void keyReleased(GlobalKeyEvent e) {
-
+				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_B&& capturing) {
+					following=false;
+					System.out.println("No longer following");
+				}
 			}
 
 			@Override
@@ -414,6 +417,10 @@ public class Main {
 					capturing = false;
 
 				}
+				 else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_MENU&& capturing) {
+						following=true;
+
+				 }
 			}
 		});
 

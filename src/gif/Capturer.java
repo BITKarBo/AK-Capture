@@ -1,6 +1,9 @@
 package gif;
 
 import java.awt.AWTException;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -35,8 +38,15 @@ public class Capturer extends Main implements Runnable {
 
 			// kierros++;
 			long alkuaika = System.nanoTime();
-
-			BufferedImage image = r.createScreenCapture(rectangle);
+			
+			if(following) {
+				PointerInfo a = MouseInfo.getPointerInfo();
+				Point b = a.getLocation();
+				int x = (int) b.getX();
+				int y = (int) b.getY();
+				rectangle.setLocation(x-((int)rectangle.getWidth()/2), y-(int)(rectangle.getHeight()/2));
+			}
+			BufferedImage image =robot.createScreenCapture(rectangle);
 			try {
 				if (image.getHeight() > 720 || image.getWidth() > 1280) {
 					image = BIResizeColor(image);
