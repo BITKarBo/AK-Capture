@@ -10,9 +10,9 @@ import java.io.IOException;
 
 public class GifWriter {
 
-	protected ImageWriter writer;
-	protected ImageWriteParam params;
-	protected IIOMetadata metadata;
+	private ImageWriter writer;
+	private ImageWriteParam params;
+	private IIOMetadata metadata;
 
 	public GifWriter(ImageOutputStream out, int imageType, int delay, boolean loop) throws IOException {
 		writer = ImageIO.getImageWritersBySuffix("gif").next();
@@ -21,9 +21,6 @@ public class GifWriter {
 		metadata = writer.getDefaultImageMetadata(imageTypeSpecifier, params);
 
 		configureRootMetadata(delay, loop);
-	
-		
-		
 		writer.setOutput(out);
 		writer.prepareWriteSequence(null);
 	}
@@ -39,11 +36,6 @@ public class GifWriter {
 		graphicsControlExtensionNode.setAttribute("delayTime", Integer.toString(delay / 10));
 		graphicsControlExtensionNode.setAttribute("transparentColorIndex", "0");
 		graphicsControlExtensionNode.setAttribute("transparentColorFlag", "TRUE");
-		
-		
-		IIOMetadataNode commentsNode = getNode(root, "CommentExtensions");
-		commentsNode.setAttribute("CommentExtension", "Created by: https://memorynotfound.com");
-
 		IIOMetadataNode appExtensionsNode = getNode(root, "ApplicationExtensions");
 		IIOMetadataNode child = new IIOMetadataNode("ApplicationExtension");
 		child.setAttribute("applicationID", "NETSCAPE");
@@ -72,7 +64,7 @@ public class GifWriter {
 		writer.writeToSequence(new IIOImage(img, null, metadata), params);
 	}
 
-	public void close() throws IOException {
+	public void close() throws Exception {
 		writer.endWriteSequence();
 	}
 
