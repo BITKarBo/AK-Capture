@@ -23,6 +23,7 @@ public class Capturer extends Main implements Runnable {
 
 	@Override
 	synchronized public void run() {
+		@SuppressWarnings("unused")
 		Robot r = null;
 		try {
 			r = new Robot();
@@ -38,15 +39,15 @@ public class Capturer extends Main implements Runnable {
 
 			// kierros++;
 			long alkuaika = System.nanoTime();
-			
-			if(following) {
+
+			if (following) {
 				PointerInfo a = MouseInfo.getPointerInfo();
 				Point b = a.getLocation();
 				int x = (int) b.getX();
 				int y = (int) b.getY();
-				rectangle.setLocation(x-((int)rectangle.getWidth()/2), y-(int)(rectangle.getHeight()/2));
+				rectangle.setLocation(x - ((int) rectangle.getWidth() / 2), y - (int) (rectangle.getHeight() / 2));
 			}
-			BufferedImage image =robot.createScreenCapture(rectangle);
+			BufferedImage image = robot.createScreenCapture(rectangle);
 			try {
 				if (image.getHeight() > 720 || image.getWidth() > 1280) {
 					image = BIResizeColor(image);
