@@ -178,7 +178,7 @@ public class Main {
 			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
 		}
-		
+		Thread.sleep(100);
 		trayIcon.setToolTip("Ready");
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/idle.gif"));
 		stats.cancel();
