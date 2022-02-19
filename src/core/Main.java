@@ -9,6 +9,9 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.MenuItem;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.PointerInfo;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -53,7 +56,7 @@ import ui.MenuListener;
 public class Main {
 
 	protected static BlockingQueue<BufferedImage> kuvatque = new ArrayBlockingQueue<BufferedImage>(300, true);
-
+	public static Näkyväikkuna ikkuna=new Näkyväikkuna(0,0,0,0, false);;
 	protected static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	protected static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	protected static Robot robot;
@@ -65,7 +68,7 @@ public class Main {
 	protected static File res = new File("res/");
 	protected static File output = new File("output/");
 	protected static int CompressionAmount = 0; // 30 min - 200 max
-
+	public static Color väri= Color.RED;
 	protected static String format = ".png";
 	protected static String finalformat = ".gif";
 	protected static String imageName = "image";
@@ -77,11 +80,11 @@ public class Main {
 	protected static MenuItem loopp;
 	protected static MenuItem circle;
 	protected static MenuItem comp;
+	protected static MenuItem col;
 	protected static MenuItem fpsslider;
 	protected static TrayIcon trayIcon;
 	protected static BufferedImage image;
 	protected static BufferedImage image2;
-
 	protected static boolean WriteFileStyle = true; // tmp hyödyntäen
 	protected static boolean capturing = false; // kuvaus
 	protected static boolean loop = true; // kuvauslol
@@ -105,7 +108,8 @@ public class Main {
 	protected static int INTERVAL = 33; // time between screenshots & default targetFPS
 
 	protected static double value = 30; // for fps label and event
-
+public static int width;
+public static int height;
 	protected static double kuvanottoviive;
 	protected static double Finalkuvanottoviive;
 	protected static double bufferviive;
@@ -153,7 +157,8 @@ public class Main {
 		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
-
+		
+		ikkuna.dispose();
 		System.gc();
 
 		System.out.println("GIF created at: " + output.getAbsolutePath() + "\\" + endFile);
@@ -334,7 +339,12 @@ public class Main {
 
 		comp.addActionListener(listen);
 		popup.add(comp);
+		
+		col = new MenuItem("Color...");
 
+		col.addActionListener(listen);
+		popup.add(col);
+		
 		popup.addSeparator();
 		MenuItem folder = new MenuItem("Folder");
 
@@ -380,6 +390,7 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.setUndecorated(true);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+		
 
 		frame.setResizable(false);
 		frame.setVisible(false);
@@ -418,6 +429,7 @@ public class Main {
 				}
 				 else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_MENU&& capturing) {
 						following=true;
+						
 
 				 }
 			}
@@ -432,14 +444,12 @@ public class Main {
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
 					Graphics2D g = (Graphics2D) label.getGraphics();
-					System.out.println();
+		
 					g.drawImage(image, 0, 0, label);
 
 					g.setColor(Color.WHITE);
-
-					g.setColor(Color.WHITE);
 					g.drawString("Size: " + (mouseX2 - mouseX) + ", " + (mouseY2 - mouseY), mouseX2, mouseY2);
-					g.setColor(Color.CYAN);
+					g.setColor(väri);
 
 					if (mouseX != mouseX2 || mouseY != mouseY2) {
 
@@ -518,20 +528,36 @@ public class Main {
 				if (valintamode == true) {
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
+					
 					try {
 						if (mouseX != mouseX2 || mouseY != mouseY2) {
-							if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0)
+							if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
 								capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY)); // 0,0 ->
+							ikkuna=new Näkyväikkuna(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY, ympyrä);
+							width=mouseX2 - mouseX;
+							height= mouseY2 - mouseY;
+							}
 																											// 1,1
-							else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0)
+							else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0) {
 								capture(new Rectangle(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2)); // 0,1 ->
+							ikkuna=new Näkyväikkuna(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2, ympyrä);
+							width=mouseX2 - mouseX;
+							height=mouseY - mouseY2;
+							}
 																												// 1,0
-							else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0)
+							else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0) {
 								capture(new Rectangle(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY)); // 1,0 ->
-																												// 0,1
-							else
-								capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2)); // 1,1 ->
-																												// 0,0
+								ikkuna=new Näkyväikkuna(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY, ympyrä);
+								width=mouseX - mouseX2;
+								height= mouseY2 - mouseY;
+							}	// 0,1
+							else {
+								capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2)); // 1,1 ->// 0,0
+								ikkuna=new Näkyväikkuna(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2,ympyrä);
+								width=mouseX - mouseX2;
+								height=  mouseY - mouseY2;
+						}
+							ikkuna.setVisible(true);
 						}
 
 					} catch (Exception e1) {

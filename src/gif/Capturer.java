@@ -45,7 +45,12 @@ public class Capturer extends Main implements Runnable {
 				Point b = a.getLocation();
 				int x = (int) b.getX();
 				int y = (int) b.getY();
+				Main.ikkuna.movee(x - ((int) Main.width / 2), y - (int) (Main.height / 2));
 				rectangle.setLocation(x - ((int) rectangle.getWidth() / 2), y - (int) (rectangle.getHeight() / 2));
+		
+				
+				
+			
 			}
 			BufferedImage image = robot.createScreenCapture(rectangle);
 			try {

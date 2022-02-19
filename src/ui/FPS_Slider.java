@@ -26,6 +26,7 @@ public class FPS_Slider extends Main implements ChangeListener {
 	}
 
 	public FPS_Slider() {
+		
 		sliderfps.setMajorTickSpacing(15);
 		sliderfps.setMinorTickSpacing(2);
 		sliderfps.setPaintTicks(true);

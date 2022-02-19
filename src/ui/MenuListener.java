@@ -1,5 +1,6 @@
 package ui;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.MenuItem;
@@ -7,6 +8,8 @@ import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+
+import javax.swing.JColorChooser;
 
 import core.Main;
 
@@ -63,7 +66,12 @@ public class MenuListener extends Main implements ActionListener {
 			@SuppressWarnings("unused")
 			Compress_Slider s = new Compress_Slider();
 		}
-
+		if (actionEvent.getActionCommand().equals("Color...")) {
+			@SuppressWarnings("unused")
+			 Color initialcolor=Color.RED;    
+			 väri=JColorChooser.showDialog(frame,"Select a color",initialcolor);   
+			     
+		}
 		if (actionEvent.getActionCommand().equals("Loop: ON")) {
 			loop=false;
 			loopp.setActionCommand("Loop: OFF");
