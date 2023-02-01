@@ -1,35 +1,111 @@
-## Welcome to GitHub Pages
+## **AK-Capture for easy GIF recording**
 
-You can use the [editor on GitHub](https://github.com/BITKarBo/AK-Capture/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+**ENJOY - @BITKarBo  &  @Arskamann**
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+[AK-Capture](https://github.com/BITKarBo/AK-Capture)
 
-### Markdown
+[FileServer](https://github.com/BITKarBo/FileServer_AK-Capture)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+AK-Capture software for capturing gifs on the fly.
+Very easy to use and many options for perfect gifs.
 
-```markdown
-Syntax highlighted code block
+###**How to use:**
+	
+	Launch AK-Capture.jar
+	You can find AK-Capture icon at icon tray.
+	"Restart if no icon, it just initialized the folders"
+	
+	Right click for recording settings.
+	
+	Default keybindings:
+		F8  -> Select area what to capture
+	        * ALT -> to move area "follow cursor" 
+		      * ESC -> cancel select
+		
+		F9  -> Fullscreen capture, start recording instantly.
+		
+		Releasing area selection start recording.
+		Pressing F8/F9 again stops recording.
+		
+	
+	After recording you can see icon change to buffering takes some time to finish compiling the gif.	
 
-# Header 1
-## Header 2
-### Header 3
+	Recordings can be found at output folder.
+	
+	After recording you can open gif from File Uploader hyper link.
+	
+	If you configure your file tranfer server, meaning IP, PORT and PATH + Password. 
+	You can Upload your gif to your server and link automaticly copies to your clipboard.
+	+ you can open gif in browser by clicking the link.
+	
+###**Settings:**
+		
+	Settings can be found /res/cfg.config -- these settings override lauch arguments.
+	You can also use launch arguments to change these settings.
+	```
+	cfg.config:
+		--followkey 18               -> [ALT]
+		--fullscreencapturekey 120    -> [F9]
+		--windowedcapturekey 119   -> [F8]
+		--pass [Password] 	-> For file tranfer server Secret.
+		--ip [Addres] 		-> For file tranfer server URL.
+		--port [Port]  		-> For file tranfer server Port.
+		--path [Path]		-> For file tranfer server custom folder path.
+		
+	launch args:
+		--menukey 18                -> [ALT]
+		--fkey 120                        -> [F9]
+		--wkey 119                       -> [F8]
+		--pass [Password] 	-> For file tranfer server Secret.
+		--ip   [Addres] 	-> For file tranfer server URL.
+		--port [Port]  		-> For file tranfer server Port.
+		--path [Path]		-> For file tranfer server custom folder path.
+		
+	
+	Example list of usable keycodes:
+	
+		112 -> [F1]  |  96  -> [NumPad-0]
+		113 -> [F2]  |  97  -> [NumPad-1]
+		114 -> [F3]  |  98  -> [NumPad-2]
+		115 -> [F4]  |  99  -> [NumPad-3]
+		116 -> [F5]  |  100 -> [NumPad-4]
+		117 -> [F6]  |  101 -> [NumPad-5]
+		118 -> [F7]  |  102 -> [NumPad-6]
+		119 -> [F8]  |  103 -> [NumPad-7]
+		120 -> [F9]  |  104 -> [NumPad-8]
+		121 -> [F10] |  105 -> [NumPad-9]
+		122 -> [F11] |  106 -> [NumPad-*]
+		123 -> [F12] |  107 -> [NumPad-/]
+		123 -> [F12] |  107 -> [NumPad-+]
+	
+	More codes https://cherrytree.at/misc/vk.htm
+	```
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
+File server for AK-CAPTURE
 
-**Bold** and _Italic_ and `Code` text
+https://github.com/BITKarBo/AK-Capture
+https://github.com/BITKarBo/FileServer_AK-Capture
 
-[Link](url) and ![Image](src)
-```
+###Usage:
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
+	Make own remote file server with FileServerini.jar by running it in your own server.
+	
+	Change --port parameter to mach your own port. 
+        Change --path FilePath to mach your own FilePath where you want save incoming gifs. 
+         There is also password that need to mach with AK-CAPTURE client.
+	
+	Using from args.
+		
+		--port [port]
+		--pass [password] <-- SHA256 Encryption
+		--path [file path]<-- change your own
+		
+	Using from cfg.config
+		
+		--port [port]
+		--pass [password] <-- SHA256 Encryption
+		--path [/temp]  <-- change your own
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/BITKarBo/AK-Capture/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ### Support or Contact
