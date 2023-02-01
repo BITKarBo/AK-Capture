@@ -74,3 +74,4 @@ Very easy to use and many options for perfect gifs.
 	
 	More codes https://cherrytree.at/misc/vk.htm
 	
+*** ENJOY - KarBo_ & Arska ***
