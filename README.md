@@ -4,6 +4,8 @@
 AK-Capture software for capturing gifs on the fly.
 Very easy to use and many options for perfect gifs.
 
+https://bitkarbo.github.io/AK-Capture/
+
 https://github.com/BITKarBo/AK-Capture
 
 https://github.com/BITKarBo/FileServer_AK-Capture
