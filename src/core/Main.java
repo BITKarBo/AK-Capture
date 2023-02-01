@@ -1,5 +1,8 @@
 package core;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import java.awt.AWTException;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -9,9 +12,6 @@ import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics2D;
 import java.awt.MenuItem;
-import java.awt.MouseInfo;
-import java.awt.Point;
-import java.awt.PointerInfo;
 import java.awt.PopupMenu;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
@@ -26,7 +26,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.awt.image.ColorModel;
 import java.awt.image.IndexColorModel;
 import java.awt.image.RescaleOp;
@@ -34,6 +33,7 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -52,11 +52,20 @@ import lc.kra.system.keyboard.GlobalKeyboardHook;
 import lc.kra.system.keyboard.event.GlobalKeyAdapter;
 import lc.kra.system.keyboard.event.GlobalKeyEvent;
 import ui.MenuListener;
+import ui.UrlDisplay;
 
 public class Main {
 
+	protected static byte[] Password;
+	protected static String IP = " ";
+	protected static String PORT = " ";
+	protected static String PATH = " ";
+	protected static Boolean MediaServer = false;
+
+	protected static File config = new File("res/cfg.config");
+
 	protected static BlockingQueue<BufferedImage> kuvatque = new ArrayBlockingQueue<BufferedImage>(300, true);
-	public static Näkyväikkuna ikkuna=new Näkyväikkuna(0,0,0,0, false);;
+	public static Näkyväikkuna ikkuna = new Näkyväikkuna(0, 0, 0, 0, false);;
 	protected static GlobalKeyboardHook keyboardHook = new GlobalKeyboardHook(true);
 	protected static Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 	protected static Robot robot;
@@ -68,10 +77,10 @@ public class Main {
 	protected static File res = new File("res/");
 	protected static File output = new File("output/");
 	protected static int CompressionAmount = 0; // 30 min - 200 max
-	public static Color väri= Color.RED;
+	public static Color väri = Color.CYAN;
 	protected static String format = ".png";
 	protected static String finalformat = ".gif";
-	protected static String imageName = "image";
+	protected static String imageName = "gif";
 
 	protected static GifWriter OGWriter = null;
 	protected static FileImageOutputStream stream;
@@ -92,7 +101,7 @@ public class Main {
 	protected static boolean valmis = true;
 	protected static boolean done = false;
 	protected static boolean ympyrä = false;
-	public static boolean following=false;
+	public static boolean following = false;
 	protected static int mouseX, mouseY, mouseX2, mouseY2;
 	protected static int kuvaindex = 0;
 	protected static int delay = 33;
@@ -108,11 +117,15 @@ public class Main {
 	protected static int INTERVAL = 33; // time between screenshots & default targetFPS
 
 	protected static double value = 30; // for fps label and event
-public static int width;
-public static int height;
+	public static int width;
+	public static int height;
 	protected static double kuvanottoviive;
 	protected static double Finalkuvanottoviive;
 	protected static double bufferviive;
+
+	protected static byte WINDOWCAPTUREKEY = GlobalKeyEvent.VK_F8;
+	protected static byte FULLSCREENCAPTUREKEY = GlobalKeyEvent.VK_F9;
+	protected static byte MENUKEY = GlobalKeyEvent.VK_MENU;
 
 	public static void capture(Rectangle rectangle) throws Exception {
 		stats = new Timer();
@@ -153,11 +166,11 @@ public static int height;
 	}
 
 	public static void stopCapture() throws Exception {
-		following=false;
+		following = false;
 		valmis = true;
 		kuvaindex = 0;
 		capturing = false;
-		
+
 		ikkuna.dispose();
 		System.gc();
 
@@ -165,28 +178,32 @@ public static int height;
 		alustus();
 
 		if (((CompressionAmount + 30) > 30) && colorizer == 0) {
-			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --colors=256 --lossy=" + (CompressionAmount + 30) + " "
+
+			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --colors=256 --lossy="
+					+ (CompressionAmount + 30) + " " + ("../" + output + "/" + endFile).toString();
+			System.out.println(compress);
+			Runtime rt = Runtime.getRuntime();
+			@SuppressWarnings("unused")
+			Process b = rt.exec(compress, null, res.getAbsoluteFile());
+
+		} else if (((CompressionAmount + 30) > 30)) {
+
+			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --lossy=" + (CompressionAmount + 30) + " "
 					+ ("../" + output + "/" + endFile).toString();
 			System.out.println(compress);
 			Runtime rt = Runtime.getRuntime();
 			@SuppressWarnings("unused")
 			Process b = rt.exec(compress, null, res.getAbsoluteFile());
 
-
-		} else if(((CompressionAmount + 30) > 30)){
-
-			String compress = "cmd /c gifsicle.exe --batch --optimize=3 --lossy=" + (CompressionAmount + 30)
-					+ " " + ("../" + output + "/" + endFile).toString();
-			System.out.println(compress);
-			Runtime rt = Runtime.getRuntime();
-			@SuppressWarnings("unused")
-			Process b = rt.exec(compress, null, res.getAbsoluteFile());
-
 		}
-		Thread.sleep(100);
+		Thread.sleep(1000);
 		trayIcon.setToolTip("Ready");
 		trayIcon.setImage(Toolkit.getDefaultToolkit().getImage("res/idle.gif"));
 		stats.cancel();
+
+		@SuppressWarnings("unused")
+		UrlDisplay urldisplay = new UrlDisplay();
+
 	}
 
 	public static BufferedImage BIResizeColor(BufferedImage sourceBufferedImage) {
@@ -207,7 +224,7 @@ public static int height;
 		switch (colorizer) {
 		case 0:
 			return sourceBufferedImage;
-		
+
 		case 1:
 
 			ColorModel cm = indexedImage.getColorModel();
@@ -339,12 +356,12 @@ public static int height;
 
 		comp.addActionListener(listen);
 		popup.add(comp);
-		
+
 		col = new MenuItem("Color...");
 
 		col.addActionListener(listen);
 		popup.add(col);
-		
+
 		popup.addSeparator();
 		MenuItem folder = new MenuItem("Folder");
 
@@ -390,7 +407,6 @@ public static int height;
 		frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		frame.setUndecorated(true);
 		frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		
 
 		frame.setResizable(false);
 		frame.setVisible(false);
@@ -399,21 +415,21 @@ public static int height;
 
 			@Override
 			public void keyReleased(GlobalKeyEvent e) {
-				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_MENU&& capturing) {
-					following=false;
+				if (e.getVirtualKeyCode() == MENUKEY && capturing) {
+					following = false;
 					System.out.println("No longer following");
 				}
 			}
 
 			@Override
 			public void keyPressed(GlobalKeyEvent e) {
-				if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && !capturing && valmis) {
+				if (e.getVirtualKeyCode() == FULLSCREENCAPTUREKEY && !capturing && valmis) {
 					try {
 						capture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
-				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && !capturing && !valintamode && valmis) {
+				} else if (e.getVirtualKeyCode() == WINDOWCAPTUREKEY && !capturing && !valintamode && valmis) {
 					valintamode = true;
 
 					valintamode();
@@ -421,17 +437,15 @@ public static int height;
 				} else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_ESCAPE && valintamode) {
 					frame.setVisible(false);
 					valintamode = false;
-				} else if ((e.getVirtualKeyCode() == GlobalKeyEvent.VK_F9 && capturing)
-						|| (e.getVirtualKeyCode() == GlobalKeyEvent.VK_F8 && capturing)) {
+				} else if ((e.getVirtualKeyCode() == FULLSCREENCAPTUREKEY && capturing)
+						|| (e.getVirtualKeyCode() == WINDOWCAPTUREKEY && capturing)) {
 					trayIcon.setToolTip("Buffering...");
 					capturing = false;
 
-				}
-				 else if (e.getVirtualKeyCode() == GlobalKeyEvent.VK_MENU&& capturing) {
-						following=true;
-						
+				} else if (e.getVirtualKeyCode() == MENUKEY && capturing) {
+					following = true;
 
-				 }
+				}
 			}
 		});
 
@@ -444,7 +458,7 @@ public static int height;
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
 					Graphics2D g = (Graphics2D) label.getGraphics();
-		
+
 					g.drawImage(image, 0, 0, label);
 
 					g.setColor(Color.WHITE);
@@ -528,35 +542,37 @@ public static int height;
 				if (valintamode == true) {
 					mouseX2 = e.getXOnScreen();
 					mouseY2 = e.getYOnScreen();
-					
+
 					try {
 						if (mouseX != mouseX2 || mouseY != mouseY2) {
 							if (mouseX2 - mouseX > 0 && mouseY2 - mouseY > 0) {
 								capture(new Rectangle(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY)); // 0,0 ->
-							ikkuna=new Näkyväikkuna(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY, ympyrä);
-							width=mouseX2 - mouseX;
-							height= mouseY2 - mouseY;
+								ikkuna = new Näkyväikkuna(mouseX, mouseY, mouseX2 - mouseX, mouseY2 - mouseY, ympyrä);
+								width = mouseX2 - mouseX;
+								height = mouseY2 - mouseY;
 							}
-																											// 1,1
+							// 1,1
 							else if (mouseX2 - mouseX > 0 && mouseY2 - mouseY < 0) {
 								capture(new Rectangle(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2)); // 0,1 ->
-							ikkuna=new Näkyväikkuna(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2, ympyrä);
-							width=mouseX2 - mouseX;
-							height=mouseY - mouseY2;
+								ikkuna = new Näkyväikkuna(mouseX, mouseY2, mouseX2 - mouseX, mouseY - mouseY2, ympyrä);
+								width = mouseX2 - mouseX;
+								height = mouseY - mouseY2;
 							}
-																												// 1,0
+							// 1,0
 							else if (mouseX2 - mouseX < 0 && mouseY2 - mouseY > 0) {
 								capture(new Rectangle(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY)); // 1,0 ->
-								ikkuna=new Näkyväikkuna(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY, ympyrä);
-								width=mouseX - mouseX2;
-								height= mouseY2 - mouseY;
-							}	// 0,1
+								ikkuna = new Näkyväikkuna(mouseX2, mouseY, mouseX - mouseX2, mouseY2 - mouseY, ympyrä);
+								width = mouseX - mouseX2;
+								height = mouseY2 - mouseY;
+							} // 0,1
 							else {
-								capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2)); // 1,1 ->// 0,0
-								ikkuna=new Näkyväikkuna(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2,ympyrä);
-								width=mouseX - mouseX2;
-								height=  mouseY - mouseY2;
-						}
+								capture(new Rectangle(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2)); // 1,1
+																												// ->//
+																												// 0,0
+								ikkuna = new Näkyväikkuna(mouseX2, mouseY2, mouseX - mouseX2, mouseY - mouseY2, ympyrä);
+								width = mouseX - mouseX2;
+								height = mouseY - mouseY2;
+							}
 							ikkuna.setVisible(true);
 						}
 
@@ -616,7 +632,92 @@ public static int height;
 		return output;
 	}
 
+	public static class HashUtil {
+
+		public static byte[] getSHA256Hash(String input) throws NoSuchAlgorithmException {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			md.update(input.getBytes());
+			byte[] hash = md.digest();
+			return hash;
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
+
+		if (args.length > 0) {
+			for (int i = 0; i < args.length; i++) {
+				if (args[i].equals("--pass")) {
+					Password = new byte[16];
+					Password = HashUtil.getSHA256Hash(args[i + 1]);
+				}
+				if (args[i].equals("--ip")) {
+					IP = args[i + 1];
+				}
+				if (args[i].equals("--path")) {
+					PATH = args[i + 1];
+				}
+				if (args[i].equals("--port")) {
+					PORT = args[i + 1];
+				}
+				if (args[i].equals("--menukey")) {
+					MENUKEY = Byte.parseByte(args[i + 1]);
+				}
+				if (args[i].equals("--fkey")) {
+					FULLSCREENCAPTUREKEY = Byte.parseByte(args[i + 1]);
+				}
+				if (args[i].equals("--wkey")) {
+					WINDOWCAPTUREKEY = Byte.parseByte(args[i + 1]);
+				}
+			}
+		}
+
+		try {
+			@SuppressWarnings("resource")
+			Scanner sc = new Scanner(config);
+			while (sc.hasNextLine()) {
+				String[] argus = sc.nextLine().split(" ");
+				if (argus.length == 2) {
+
+					if (argus[0].equals("--pass")) {
+
+						Password = HashUtil.getSHA256Hash(argus[1]);
+
+					}
+					if (argus[0].equals("--ip")) {
+						IP = argus[1];
+					}
+					if (argus[0].equals("--path")) {
+						PATH = argus[1];
+					}
+					if (argus[0].equals("--port")) {
+						PORT = argus[1];
+					}
+					if (argus[0].equals("--followkey")) {
+						MENUKEY = Byte.parseByte(argus[1]);
+					}
+					if (argus[0].equals("--fullscreencapturekey")) {
+						FULLSCREENCAPTUREKEY = Byte.parseByte(argus[1]);
+					}
+					if (argus[0].equals("--windowedcapturekey")) {
+						WINDOWCAPTUREKEY = Byte.parseByte(argus[1]);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Loaded Config File with data:\n");
+		if (IP != " " && PORT != " " && PATH != " ") {
+			System.out.println("Media server ON");
+			System.out.println("IP: " + IP + ":" + PORT + PATH);
+			MediaServer = true;
+		} else {
+			System.out.println("Media server OFF");
+		}
+		System.out.println("Follow KEY: " + MENUKEY);
+		System.out.println("Fullscreen KEY: " + FULLSCREENCAPTUREKEY);
+		System.out.println("Windowed KEY: " + WINDOWCAPTUREKEY);
 
 		alustus();
 		Window();
