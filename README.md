@@ -13,7 +13,7 @@ Very easy to use and many options for perfect gifs.
 	
 	Default keybindings:
 		F8  -> Select area what to capture
-	    * ALT -> to move area "follow cursor" 
+		* ALT -> to move area "follow cursor" 
 		* ESC -> cancel select
 		
 		F9  -> Fullscreen capture, start recording instantly.
@@ -32,22 +32,22 @@ Very easy to use and many options for perfect gifs.
 	You can Upload your gif to your server and link automaticly copies to your clipboard.
 	+ you can open gif in browser by clicking the link.
 	
-**Settings: **
+**Settings:**
 		
 	Settings can be found /res/cfg.config -- these settings override lauch arguments.
 	You can also use launch arguments to change these settings.
 	
 	cfg.config:
-		--followkey 18 				-> [ALT]
-		--fullscreencapturekey 120 	-> [F9]
-		--windowedcapturekey 119 	-> [F8]
+		--followkey 18 					-> [ALT]
+		--fullscreencapturekey 120 			-> [F9]
+		--windowedcapturekey 119 			-> [F8]
 		--pass [Password] 	-> For file tranfer server Secret.
 		--ip [Addres] 		-> For file tranfer server URL.
 		--port [Port]  		-> For file tranfer server Port.
 		--path [Path]		-> For file tranfer server custom folder path.
 		
 	launch args:
-		--menukey 18 				-> [ALT]
+		--menukey 18 					-> [ALT]
 		--fkey 120 					-> [F9]
 		--wkey 119 					-> [F8]
 		--pass [Password] 	-> For file tranfer server Secret.
